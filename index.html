@@ -20,6 +20,7 @@
   --shadow:0 1px 2px rgba(21,23,30,.06),0 4px 14px rgba(21,23,30,.07);
   --shadow-lg:0 6px 32px rgba(21,23,30,.18);
   --chip-critical-bg:#fbe7e7; --chip-warn-bg:#fdf3d9; --chip-good-bg:#e2f3e2; --chip-serious-bg:#fceee7; --chip-info-bg:#e8ecf8;
+  --cancel:#5b6170; --cancel-bg:#e6e7ec; --cancel-text:#454a57;
   color-scheme:light;
 }
 @media (prefers-color-scheme: dark){
@@ -35,6 +36,7 @@
     --shadow:0 1px 2px rgba(0,0,0,.4),0 4px 14px rgba(0,0,0,.35);
     --shadow-lg:0 8px 40px rgba(0,0,0,.55);
     --chip-critical-bg:#3a2224; --chip-warn-bg:#37301c; --chip-good-bg:#1e3120; --chip-serious-bg:#382822; --chip-info-bg:#252b40;
+    --cancel:#8d93a3; --cancel-bg:#2b2d35; --cancel-text:#b9bdc8;
     color-scheme:dark;
   }
 }
@@ -50,6 +52,7 @@
   --shadow:0 1px 2px rgba(0,0,0,.4),0 4px 14px rgba(0,0,0,.35);
   --shadow-lg:0 8px 40px rgba(0,0,0,.55);
   --chip-critical-bg:#3a2224; --chip-warn-bg:#37301c; --chip-good-bg:#1e3120; --chip-serious-bg:#382822; --chip-info-bg:#252b40;
+  --cancel:#8d93a3; --cancel-bg:#2b2d35; --cancel-text:#b9bdc8;
   color-scheme:dark;
 }
 
@@ -339,6 +342,149 @@ svg text{font-family:inherit}
   .nav-item{justify-content:center}
   .nav-badge{display:none}
 }
+
+/* ================= v2: รูปสินค้า · งานที่ยกเลิก · Job Dashboard · PDF ================= */
+.gf-img{position:relative;display:block;overflow:hidden;background:var(--surface3);border-radius:7px}
+.gf-img img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;display:block}
+.gf-ph{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;color:var(--ink3);font-size:10.5px;text-align:center;padding:4px}
+.gf-ph svg{opacity:.7}
+.gf-ph i{font-style:normal}
+.gf-img[data-state="ok"] .gf-ph{display:none}
+.gf-img[data-state="none"] .gf-ph i::after{content:"ไม่มีรูปสินค้า"}
+.gf-img[data-state="broken"] .gf-ph i::after{content:"โหลดรูปไม่ได้"}
+.gf-img[data-state="loading"] .gf-ph svg{animation:gf-pulse 1.2s ease-in-out infinite}
+@keyframes gf-pulse{50%{opacity:.25}}
+.jcard-imgwrap{margin:-3px -4px 7px}
+.jcard-imgwrap .gf-img{height:84px}
+.jcard-imgwrap[data-zoom]{cursor:zoom-in}
+.kcol-sep{flex:0 0 2px;margin:4px 2px;background:repeating-linear-gradient(to bottom,var(--line2) 0 6px,transparent 6px 12px)}
+.kcol-cancel{background:repeating-linear-gradient(135deg,var(--surface2) 0 9px,var(--surface3) 9px 10px)}
+.kcol-cancel .kcol-title{color:var(--cancel-text)}
+.jcard.cancelled{cursor:pointer;border-style:dashed;border-color:var(--cancel)}
+.jcard.cancelled .gf-img img{filter:grayscale(1);opacity:.85}
+.jcard.cancelled .jcard-name{text-decoration:line-through;text-decoration-color:var(--ink3)}
+.jcard-cx{font-size:11px;color:var(--ink2)}
+.jcard-cx-r{font-size:11.5px;color:var(--ink);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin-top:1px}
+.chip.cancel{background:var(--cancel-bg);color:var(--cancel-text)}
+.kpi.tone-cancel .kpi-value{color:var(--cancel-text)}
+.btn:disabled{opacity:.5;cursor:not-allowed}
+.btn.danger.solid{background:var(--critical);border-color:var(--critical);color:#fff}
+.jd-head{padding-right:60px}
+.jd-img{flex:none;width:72px;height:72px;cursor:zoom-in}
+.jd-img .gf-img{width:72px;height:72px}
+.jd-actions{display:flex;gap:6px;justify-content:flex-end;flex-wrap:wrap}
+.cx-banner{margin:12px 24px 0;display:flex;gap:10px 16px;align-items:center;flex-wrap:wrap;background:var(--cancel-bg);color:var(--ink);border:1px dashed var(--cancel);border-radius:9px;padding:10px 14px;font-size:12.5px}
+.cx-banner b{color:var(--cancel-text)}
+.imgpick{display:flex;gap:12px;align-items:center;flex-wrap:wrap;background:var(--surface2);border:1px dashed var(--line2);border-radius:9px;padding:10px}
+.imgpick .gf-img{width:96px;height:96px;flex:none}
+.imgpick-side{display:grid;gap:5px;min-width:0;flex:1}
+.imgpick-name{white-space:nowrap;overflow:hidden;text-overflow:ellipsis;font-weight:600}
+.imgpick-status{min-height:17px}
+.imgpick-status.err{color:var(--critical-text)}
+.imgpick-status.ok{color:var(--good-text)}
+/* หน้าต่างที่เปิดซ้อนจาก Job Detail ต้องอยู่ชั้นบนกว่า */
+#modal-cancel,#modal-restore,#modal-img{z-index:250}
+.img-view{display:grid;place-items:center;gap:8px}
+.img-view .gf-img{width:min(460px,100%);aspect-ratio:1/1}
+.img-full{max-width:100%;max-height:76vh;border-radius:8px;display:block}
+.kpi7{grid-template-columns:repeat(7,minmax(0,1fr))}
+.kpi4{grid-template-columns:repeat(4,minmax(0,1fr))}
+.rules{font-size:12px;color:var(--ink2)}
+.rules summary{cursor:pointer;font-weight:600;color:var(--accent)}
+.rules ul{margin:8px 0 0;padding-left:18px;display:grid;gap:3px}
+.stack-bar{display:flex;height:14px;border-radius:7px;overflow:hidden;background:var(--surface3);margin-bottom:6px}
+.stack-bar i{display:block;height:100%}
+.bj-picker{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr) auto;gap:12px;align-items:end}
+.bj-actions{display:flex;gap:8px;flex-wrap:wrap}
+.bj-head{display:grid;grid-template-columns:220px minmax(0,1fr);gap:20px;align-items:start}
+.bj-img .gf-img{width:220px;height:220px}
+.bj-img[data-zoom]{cursor:zoom-in}
+.gf-img img:not([src]){visibility:hidden}
+.bj-name{font-size:20px;font-weight:700;margin:2px 0 6px;line-height:1.3}
+.info-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:9px 18px;margin:12px 0 0}
+.info-grid > div{display:grid;gap:1px;min-width:0}
+.info-grid dt{font-size:11px;color:var(--ink3);font-weight:600}
+.info-grid dd{margin:0;font-weight:500;overflow-wrap:anywhere}
+.nodata{color:var(--ink3);font-style:italic;font-weight:400}
+.cx-filters{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin-bottom:12px}
+.cx-filters input,.cx-filters select{font-size:12.5px;padding:5px 8px}
+.cx-filters label{display:inline-flex;align-items:center;gap:5px;color:var(--ink2)}
+.cx-thumb .gf-img{width:44px;height:44px}
+.cx-step{display:grid;gap:10px}
+@media (max-width:900px){
+  .bj-picker{grid-template-columns:1fr}
+  .bj-head{grid-template-columns:1fr}
+  .bj-img .gf-img{width:100%;height:220px}
+  .info-grid{grid-template-columns:1fr 1fr}
+  .kpi7,.kpi4{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .kpi-row{grid-template-columns:repeat(2,minmax(0,1fr))!important}
+  .fgrid{grid-template-columns:1fr}
+}
+@media (prefers-reduced-motion: reduce){ .gf-img[data-state="loading"] .gf-ph svg{animation:none} }
+/* ช่องที่แก้ไม่ได้ (เช่น งานที่ยกเลิก) */
+input:disabled,select:disabled,textarea:disabled{background:var(--surface2);color:var(--ink2);cursor:not-allowed}
+/* มือถือ: ไม่ให้แถบด้านบนดันความกว้างจนหน้าล้นจอ */
+#main,#topbar{min-width:0}
+@media (max-width:700px){
+  #app{grid-template-columns:52px minmax(0,1fr)}
+  #topbar{padding:0 10px;gap:8px}
+  #page-title{font-size:13.5px;line-height:1.25;max-width:30vw;overflow:hidden;text-overflow:ellipsis}
+  .top-search{flex:1 1 auto;min-width:0;margin-left:0}
+  .top-search input{font-size:12px}
+  .top-right{gap:4px}
+  #user-select{max-width:96px;font-size:12px;padding:5px 6px}
+  .page{padding:14px 12px}
+  .board-toolbar{padding:10px 12px}
+  .board-toolbar input,.board-toolbar select{flex:1 1 130px;width:auto;max-width:none}
+  #kanban{padding:12px}
+  .modal-back{padding:2vh 8px}
+  .jd-head{flex-wrap:wrap;padding:16px 16px 0}
+  .jd-side{margin-left:0;text-align:left;flex:1 1 100%}
+  .jd-side .flex{justify-content:flex-start!important}
+  .jd-actions{justify-content:flex-start}
+  .tabs{padding:10px 12px 0}
+  .jd-body{padding:14px}
+  .cx-banner{margin:10px 12px 0}
+}
+
+/* ---------- รายงาน PDF (หน้า A4 ที่ 96dpi = 794×1123px) ---------- */
+#rpt-root{position:fixed;left:0;top:0;z-index:-9999;pointer-events:none;width:794px}
+.rpt-page{width:794px;height:1123px;background:#fff;color:#15171e;padding:34px 44px 24px;display:flex;flex-direction:column;font-family:"IBM Plex Sans Thai","Segoe UI","Leelawadee UI",sans-serif;font-size:11.5px;line-height:1.5}
+.rpt-hd{display:flex;justify-content:space-between;align-items:center;border-bottom:2px solid #15171e;padding-bottom:7px;margin-bottom:12px;font-size:11px;color:#565962}
+.rpt-hd b{color:#3450a8}
+.rpt-hd .mono{font-weight:600;color:#15171e;font-size:12px}
+.rpt-body{flex:1;min-height:0;overflow:hidden}
+.rpt-ft{display:flex;justify-content:space-between;gap:12px;border-top:1px solid #d2d2cc;padding-top:6px;margin-top:8px;font-size:9.5px;color:#7a7d86}
+.rpt-title{display:grid;grid-template-columns:minmax(0,1fr) 210px;gap:20px;align-items:start}
+.rpt-kicker{font-size:10.5px;font-weight:700;letter-spacing:.06em;color:#3450a8}
+.rpt-title h1{font-size:21px;line-height:1.3;margin:2px 0 4px}
+.rpt-no{font-family:"IBM Plex Mono",Consolas,monospace;font-weight:600;font-size:13px}
+.rpt-chips{display:flex;gap:6px;flex-wrap:wrap;margin:6px 0}
+.rpt-chip{display:inline-block;border-radius:99px;padding:1px 9px;font-size:10.5px;font-weight:600;background:#eeeeea;color:#454a57}
+.rpt-chip.cancel{background:#e6e7ec;color:#454a57;border:1px dashed #5b6170}
+.rpt-chip.crit{background:#fbe7e7;color:#b02a2a}
+.rpt-chip.good{background:#e2f3e2;color:#006300}
+.rpt-prog{display:flex;align-items:center;gap:8px;font-size:11px;margin-top:4px}
+.rpt-prog span{display:block;flex:1;height:6px;border-radius:9px;background:#eeeeea;overflow:hidden}
+.rpt-prog i{display:block;height:100%;background:#3450a8}
+.rpt-imgbox{width:210px;height:210px;border:1px solid #e3e3de;border-radius:8px;display:flex;align-items:center;justify-content:center;background:#f7f7f4;overflow:hidden;text-align:center;color:#8b8d94;font-size:10.5px;padding:6px}
+.rpt-sec{margin-top:13px}
+.rpt-sec h3{font-size:13px;margin:0 0 6px;padding-bottom:3px;border-bottom:1px solid #d2d2cc}
+.rpt-sec h3 .cont{font-weight:400;color:#8b8d94;font-size:11px}
+.rpt-kv{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:6px 16px}
+.rpt-kv div{min-width:0}
+.rpt-kv dt{font-size:9.5px;color:#7a7d86;font-weight:600}
+.rpt-kv dd{margin:0;font-weight:500;overflow-wrap:anywhere}
+.rpt-tbl{width:100%;border-collapse:collapse;font-size:10px;table-layout:fixed}
+.rpt-tbl th{background:#f2f3f0;text-align:left;padding:4px 6px;font-weight:600;color:#565962;border-bottom:1px solid #d2d2cc}
+.rpt-tbl td{padding:4px 6px;border-bottom:1px solid #eceae4;vertical-align:top;overflow-wrap:anywhere}
+.rpt-tbl .r{text-align:right}
+.rpt-empty,.rpt-na{color:#8b8d94;font-style:italic}
+.rpt-sum{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:6px 16px;margin-top:8px}
+.rpt-sum div{border:1px solid #e3e3de;border-radius:6px;padding:5px 8px}
+.rpt-sum dt{font-size:9.5px;color:#7a7d86;font-weight:600}
+.rpt-sum dd{margin:0;font-weight:700;font-size:12px}
+.rpt-note{font-size:10px;color:#7a7d86;margin-top:4px}
 </style>
 </head>
 <body>
@@ -360,6 +506,10 @@ svg text{font-family:inherit}
       <button class="nav-item" data-page="calendar">
         <svg width="15" height="15" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6"><rect x="1.5" y="2.5" width="13" height="12" rx="1.5"/><path d="M1.5 6h13M5 1v3M11 1v3"/></svg>
         <span>Calendar / Gantt</span>
+      </button>
+      <button class="nav-item" data-page="cancelled" title="งานที่ถูกยกเลิก (Cancelled Jobs)" aria-label="งานที่ถูกยกเลิก">
+        <svg width="15" height="15" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6"><circle cx="8" cy="8" r="6.5"/><path d="M3.4 12.6 12.6 3.4"/></svg>
+        <span>งานที่ยกเลิก</span>
       </button>
       <div class="nav-label">ภาพรวม</div>
       <button class="nav-item" data-page="dashboard">
@@ -439,7 +589,7 @@ svg text{font-family:inherit}
 
     <!-- ============ DASHBOARD ============ -->
     <section class="page" id="page-dashboard">
-      <div class="kpi-row" style="grid-template-columns:repeat(6,1fr)" id="dash-kpis"></div>
+      <div class="kpi-row" style="grid-template-columns:repeat(7,1fr)" id="dash-kpis"></div>
       <div class="grid3 section-gap">
         <div class="card">
           <div class="card-title">Workflow — จำนวนงานในแต่ละขั้นตอน <span class="hint">คลิกแท่งเพื่อดูงานในสถานะนั้น</span></div>
@@ -464,6 +614,37 @@ svg text{font-family:inherit}
 
     <!-- ============ BUSINESS ============ -->
     <section class="page" id="page-business">
+      <div class="flex section-gap">
+        <div class="period-tabs" id="biz-mode" role="group" aria-label="รูปแบบ Dashboard">
+          <button data-m="overall" class="active">ภาพรวมธุรกิจ</button>
+          <button data-m="job">ราย Job</button>
+        </div>
+      </div>
+      <div id="biz-job" hidden>
+        <div class="card section-gap bj-picker">
+          <div class="field"><label for="bj-search">ค้นหา Job</label><input id="bj-search" type="search" placeholder="Job No. / ชื่องาน / SKU / ลูกค้า / เซล / Merchandiser / R&amp;D" autocomplete="off"></div>
+          <div class="field"><label for="bj-select">เลือก Job</label><select id="bj-select"></select></div>
+          <div class="bj-actions"><button class="btn" id="bj-open" disabled>เปิด Job Detail</button><button class="btn primary" id="bj-pdf" disabled>Export Job Report PDF</button></div>
+        </div>
+        <div id="bj-report"></div>
+      </div>
+      <div id="biz-overall">
+      <div class="card section-gap">
+        <div class="card-title">สถานะงานทั้งหมด ณ ปัจจุบัน <span class="hint">นับจากทุกงานในฐานข้อมูล · คลิกการ์ดเพื่อดูรายการ</span></div>
+        <div class="kpi-row kpi7" id="biz-status-kpis" style="margin-bottom:10px"></div>
+        <details class="rules"><summary>หลักเกณฑ์การนับ</summary><ul id="biz-rules"></ul></details>
+      </div>
+      <div class="grid2 section-gap">
+        <div class="card">
+          <div class="card-title">สรุปสถานะงาน <span class="hint">คลิกแท่งเพื่อดูงาน</span></div>
+          <div id="biz-status-chart"></div>
+        </div>
+        <div class="card">
+          <div class="card-title">งานที่ต้องติดตามเร่งด่วน <span class="hint">ล่าช้า · ใกล้ถึงกำหนด · High priority</span></div>
+          <div class="tbl-wrap"><table class="tbl" id="biz-urgent"></table></div>
+        </div>
+      </div>
+      <div class="card-title" style="margin:6px 0 10px">ยอดขาย · ต้นทุน · กำไร <span class="hint" id="biz-cancel-note"></span></div>
       <div class="flex section-gap">
         <div class="period-tabs" id="biz-period">
           <button data-p="today">Today</button>
@@ -494,6 +675,27 @@ svg text{font-family:inherit}
       <div class="card section-gap">
         <div class="card-title">รายละเอียดราย Job</div>
         <div class="tbl-wrap"><table class="tbl" id="biz-tbl"></table></div>
+      </div>
+      </div>
+    </section>
+
+    <!-- ============ CANCELLED JOBS ============ -->
+    <section class="page" id="page-cancelled">
+      <div class="kpi-row kpi4" id="cxp-kpis"></div>
+      <div class="card">
+        <div class="cx-filters" role="search">
+          <input id="cf-q" type="search" placeholder="ค้นหา Job No. / ชื่องาน" aria-label="ค้นหา Job No. หรือชื่องาน">
+          <label for="cf-from">ยกเลิกตั้งแต่ <input id="cf-from" type="date"></label>
+          <label for="cf-to">ถึง <input id="cf-to" type="date"></label>
+          <select id="cf-customer" aria-label="กรองตามลูกค้า"></select>
+          <select id="cf-sales" aria-label="กรองตามเซลเจ้าของงาน"></select>
+          <select id="cf-by" aria-label="กรองตามผู้ยกเลิก"></select>
+          <select id="cf-reason" aria-label="กรองตามเหตุผล"></select>
+          <select id="cf-sort" aria-label="เรียงลำดับ"><option value="desc">ยกเลิกล่าสุดก่อน</option><option value="asc">ยกเลิกเก่าสุดก่อน</option></select>
+          <button class="btn ghost sm" id="cf-clear">ล้างตัวกรอง ✕</button>
+          <span class="tb-count" id="cxp-count"></span>
+        </div>
+        <div class="tbl-wrap"><table class="tbl" id="cxp-tbl"></table></div>
       </div>
     </section>
 
@@ -557,10 +759,26 @@ svg text{font-family:inherit}
         <div class="field"><label>Job No. <span class="req">*</span></label><input id="nj-jobno" class="mono" placeholder="MD-xxx"></div>
         <div class="field"><label>เซลเจ้าของงาน <span class="req">*</span></label><input id="nj-customer" list="dl-customers" placeholder="ชื่อเซลเจ้าของงาน"></div>
         <div class="field full"><label>Product Name <span class="req">*</span></label><input id="nj-product" placeholder="เช่น Linen Oversized Shirt"></div>
+        <div class="field full"><label for="nj-img-file">Product Image / รูปสินค้า <span class="muted" style="font-weight:400">(ไม่บังคับ)</span></label>
+          <div class="imgpick">
+            <span id="nj-img-prev"></span>
+            <div class="imgpick-side">
+              <div class="imgpick-name" id="nj-img-name">ยังไม่ได้เลือกรูป</div>
+              <div class="flex" style="flex-wrap:wrap">
+                <label class="btn sm" for="nj-img-file" id="nj-img-pick" tabindex="0" role="button">อัปโหลดรูป</label>
+                <button class="btn ghost sm" id="nj-img-remove" type="button" hidden>ลบรูป</button>
+              </div>
+              <input type="file" id="nj-img-file" accept="image/jpeg,image/png,image/webp" hidden>
+              <div class="small muted">JPG, PNG หรือ WEBP · ไม่เกิน 5 MB · อัปโหลดเมื่อกด “สร้าง Job”</div>
+              <div class="imgpick-status small" id="nj-img-status" role="status"></div>
+            </div>
+          </div>
+        </div>
         <div class="field"><label>SKU</label><input id="nj-sku" class="mono" placeholder="SH-001"></div>
         <div class="field"><label>Product Type</label>
           <select id="nj-type"><option>Shirt</option><option>T-Shirt</option><option>Polo</option><option>Dress</option><option>Pants</option><option>Skirt</option><option>Jacket</option><option>Uniform</option><option>Other</option></select>
         </div>
+        <div class="field"><label>ลูกค้า (Customer)</label><input id="nj-custname" list="dl-custnames" placeholder="ชื่อลูกค้า / แบรนด์"></div>
         <div class="field"><label>Order Quantity (pcs)</label><input id="nj-qty" type="number" min="0" value="0"></div>
         <div class="field"><label>Sample Quantity (pcs)</label><input id="nj-sampleqty" type="number" min="0" value="1"></div>
         <div class="field"><label>Start Date</label><input id="nj-start" type="date"></div>
@@ -569,6 +787,8 @@ svg text{font-family:inherit}
           <select id="nj-priority"><option value="normal">Normal</option><option value="high">🔥 High</option><option value="low">Low</option></select>
         </div>
         <div class="field"><label>ผู้รับผิดชอบหลัก</label><select id="nj-person"></select></div>
+        <div class="field"><label>Merchandiser</label><select id="nj-merch"></select></div>
+        <div class="field"><label>R&amp;D</label><select id="nj-rd"></select></div>
         <div class="field full"><label>Notes</label><textarea id="nj-notes" rows="2" placeholder="รายละเอียดเพิ่มเติม…"></textarea></div>
       </div>
       <div class="flex mt14" style="justify-content:flex-end;gap:8px">
@@ -579,6 +799,64 @@ svg text{font-family:inherit}
   </div>
 </div>
 <datalist id="dl-customers"></datalist>
+<datalist id="dl-custnames"></datalist>
+
+<!-- ============ CANCEL JOB MODAL ============ -->
+<div class="modal-back" id="modal-cancel">
+  <div class="modal w-md" role="dialog" aria-labelledby="cx-title">
+    <button class="modal-close" data-close="modal-cancel" aria-label="ปิด">✕</button>
+    <div class="modal-head"><h2 style="font-size:16px" id="cx-title">ยกเลิกงาน (Cancel Job)</h2></div>
+    <div class="modal-body cx-step">
+      <div class="fgrid" id="cx-form">
+        <div class="field"><label for="cx-jobno">Job No.</label><input id="cx-jobno" class="mono" readonly></div>
+        <div class="field"><label for="cx-name">Job Name</label><input id="cx-name" readonly></div>
+        <div class="field full"><label for="cx-reason">เหตุผลการยกเลิก <span class="req">*</span></label><select id="cx-reason"></select></div>
+        <div class="field full"><label for="cx-details">รายละเอียดเพิ่มเติม <span class="req" id="cx-details-req" hidden>* (จำเป็นเมื่อเลือก “อื่น ๆ”)</span></label><textarea id="cx-details" rows="3" maxlength="1000" placeholder="เช่น ลูกค้าแจ้งยกเลิกทางอีเมลวันที่ …"></textarea></div>
+        <div class="field"><label for="cx-by">ผู้ยกเลิก</label><input id="cx-by" readonly></div>
+        <div class="field"><label for="cx-at">วันที่ยกเลิก</label><input id="cx-at" readonly value="ระบบบันทึกเวลาเมื่อกดยืนยัน"></div>
+        <div class="field full" id="cx-pin-wrap"><label for="cx-pin">PIN ส่วนตัวของคุณ <span class="req">*</span> <span class="muted" style="font-weight:400">ยืนยันตัวตนและสิทธิ์ยกเลิกงาน</span></label><input id="cx-pin" type="password" inputmode="numeric" autocomplete="off"></div>
+      </div>
+      <div class="crit-banner" id="cx-confirm" hidden style="margin:0">คุณต้องการยกเลิก Job นี้ใช่หรือไม่? การยกเลิกจะบันทึกประวัติไว้ในระบบ และไม่สามารถลบประวัตินี้ได้โดยผู้ใช้ทั่วไป</div>
+      <div class="small" id="cx-err" role="alert" style="color:var(--critical-text);min-height:18px"></div>
+      <div class="flex" style="justify-content:flex-end;gap:8px;flex-wrap:wrap">
+        <button class="btn" id="cx-back" type="button">ปิด</button>
+        <button class="btn danger" id="cx-next" type="button">ยกเลิกงาน…</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ============ RESTORE JOB MODAL ============ -->
+<div class="modal-back" id="modal-restore">
+  <div class="modal w-md" role="dialog" aria-labelledby="rs-title">
+    <button class="modal-close" data-close="modal-restore" aria-label="ปิด">✕</button>
+    <div class="modal-head"><h2 style="font-size:16px" id="rs-title">กู้คืนงาน (Restore Job)</h2></div>
+    <div class="modal-body cx-step">
+      <div class="small" id="rs-info"></div>
+      <div class="fgrid" id="rs-form">
+        <div class="field full"><label for="rs-status">สถานะหลังกู้คืน <span class="req">*</span></label><select id="rs-status"></select></div>
+        <div class="field full"><label for="rs-reason">เหตุผลการกู้คืน <span class="req">*</span></label><textarea id="rs-reason" rows="2" maxlength="300" placeholder="เช่น ลูกค้ายืนยันสั่งผลิตต่อ"></textarea></div>
+        <div class="field"><label for="rs-by">ผู้กู้คืน</label><input id="rs-by" readonly></div>
+        <div class="field" id="rs-pin-wrap"><label for="rs-pin">PIN ส่วนตัวของคุณ <span class="req">*</span></label><input id="rs-pin" type="password" inputmode="numeric" autocomplete="off"></div>
+      </div>
+      <div class="warn-banner" id="rs-confirm" hidden style="margin:0">คุณต้องการกู้คืน Job นี้ใช่หรือไม่? ระบบจะบันทึกผู้กู้คืน วันเวลา และเหตุผลไว้ โดยประวัติการยกเลิกเดิมยังอยู่ครบ</div>
+      <div class="small" id="rs-err" role="alert" style="color:var(--critical-text);min-height:18px"></div>
+      <div class="flex" style="justify-content:flex-end;gap:8px;flex-wrap:wrap">
+        <button class="btn" id="rs-back" type="button">ปิด</button>
+        <button class="btn primary" id="rs-next" type="button">กู้คืนงาน…</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ============ PRODUCT IMAGE VIEWER ============ -->
+<div class="modal-back" id="modal-img">
+  <div class="modal w-md" role="dialog" aria-labelledby="img-title">
+    <button class="modal-close" data-close="modal-img" aria-label="ปิด">✕</button>
+    <div class="modal-head"><h2 style="font-size:15px" id="img-title">รูปสินค้า</h2></div>
+    <div class="modal-body"><div class="img-view" id="img-view"></div></div>
+  </div>
+</div>
 
 <!-- ============ JOB DETAIL MODAL ============ -->
 <div class="modal-back" id="modal-job">
@@ -651,11 +929,13 @@ const STATUSES = [
   {key:"rework",        label:"แก้ไขงาน",            dot:"#e34948", phase:"production"},
   {key:"done_prod",     label:"ผลิตเสร็จ",            dot:"#0ca30c", phase:"closing"},
   {key:"delivered",     label:"ส่งมอบ",              dot:"#0ca30c", phase:"closing"},
-  {key:"closed",        label:"ปิดงาน",              dot:"#8b8d94", phase:"closing"}
+  {key:"closed",        label:"ปิดงาน",              dot:"#8b8d94", phase:"closing"},
+  /* v2: แยกจาก Workflow ปกติ — ไม่นับเป็นงานที่กำลังทำ งานเสร็จ หรืองานล่าช้า */
+  {key:"cancelled",     label:"ยกเลิกงาน",            dot:"#5b6170", phase:"cancelled"}
 ];
 const ST = Object.fromEntries(STATUSES.map((s,i)=>[s.key,{...s,idx:i}]));
 const stLabel = k => ST[k] ? ST[k].label : k;
-const ACTIVE_KEYS = STATUSES.map(s=>s.key).filter(k=>!["done_prod","delivered","closed"].includes(k));
+const ACTIVE_KEYS = STATUSES.map(s=>s.key).filter(k=>!["done_prod","delivered","closed","cancelled"].includes(k));
 const PROGRESS = {new:0,wait_fabric:8,fabric_ready:15,sampling:25,sample_revise:30,sample_ok:38,wait_prod:42,cutting:55,sewing:70,qc:82,rework:85,done_prod:92,delivered:97,closed:100};
 
 const MAT_TYPES = ["Fabric","Button","Zipper","Label","Thread","Packaging","Other"];
@@ -685,6 +965,7 @@ function fmtDY(s){ const d=parseD(s); return d? d.getDate()+" "+TH_M[d.getMonth(
 function fmtDT(ts){ const d=new Date(ts); return d.getDate()+" "+TH_M[d.getMonth()]+" "+String(d.getHours()).padStart(2,"0")+":"+String(d.getMinutes()).padStart(2,"0"); }
 function daysDiff(a,b){ return Math.round((parseD(b)-parseD(a))/864e5); }
 function dueInfo(job){
+  if(job.status==="cancelled") return {state:"cancelled",days:null};
   if(["delivered","closed"].includes(job.status)) return {state:"done",days:null};
   if(!job.dueDate) return {state:"none",days:null};
   const d = daysDiff(todayIso(), job.dueDate);
@@ -712,7 +993,7 @@ function costPerPiece(job){ const q=num(job.prodQty)||num(job.qty); return q>0? 
 function totalSales(job){ return num(job.sales?.price)*num(job.sales?.qtySold); }
 function grossProfit(job){ return totalSales(job)-totalCost(job); }
 function grossMargin(job){ const s=totalSales(job); return s>0? grossProfit(job)/s*100 : 0; }
-function jobProgress(job){ return PROGRESS[job.status] ?? 0; }
+function jobProgress(job){ return job.status==="cancelled"? (PROGRESS[job.previousStatus] ?? 0) : (PROGRESS[job.status] ?? 0); }
 function stageDurations(job){
   /* [{status,start,end,days,by,note}] closed intervals + open current one */
   return (job.history||[]).map((h,i,arr)=>{
@@ -994,7 +1275,7 @@ function logAct(job,action){
 "use strict";
 /* ================= NAVIGATION ================= */
 let currentPage="board";
-const PAGE_TITLES={board:"Kanban Board",dashboard:"Dashboard",business:"Business Dashboard",performance:"Production Performance",calendar:"Calendar / Gantt",team:"Team Workload"};
+const PAGE_TITLES={board:"Kanban Board",dashboard:"Dashboard",business:"Business Dashboard",performance:"Production Performance",calendar:"Calendar / Gantt",team:"Team Workload",cancelled:"Cancelled Jobs · งานที่ถูกยกเลิก"};
 function showPage(p){
   currentPage=p;
   $$(".page").forEach(el=>el.classList.toggle("active", el.id==="page-"+p));
@@ -1009,6 +1290,7 @@ function renderPage(p){
   else if(p==="performance") renderPerformance();
   else if(p==="calendar") renderCalendar();
   else if(p==="team") renderTeam();
+  else if(p==="cancelled") renderCancelled();
 }
 function refreshAll(){
   renderPage(currentPage);
@@ -1059,6 +1341,7 @@ function jobCardHtml(j){
   const di=dueInfo(j), prog=jobProgress(j);
   const dueCls=di.state==="overdue"?"overdue":di.state==="duesoon"?"duesoon":"";
   return `<div class="jcard ${dueCls}" draggable="true" data-id="${j.id}" role="button" tabindex="0" aria-label="${esc(j.jobNo)} ${esc(j.product)}">
+    ${cardImgHtml(j)}
     <div class="jcard-top">
       <span class="jcard-no mono">${esc(j.jobNo)}</span>
       <span class="jcard-flags">${priorityChip(j)}</span>
@@ -1082,7 +1365,7 @@ function renderKanban(){
   const board=$("#kanban");
   const jobs=state.db.jobs.filter(jobMatches);
   $("#board-count").textContent=`แสดง ${jobs.length} / ${state.db.jobs.length} งาน`;
-  board.innerHTML=STATUSES.map(s=>{
+  board.innerHTML=STATUSES.filter(s=>s.key!=="cancelled").map(s=>{
     const list=jobs.filter(j=>j.status===s.key);
     return `<div class="kcol" data-status="${s.key}">
       <div class="kcol-head">
@@ -1094,8 +1377,10 @@ function renderKanban(){
         ${list.map(jobCardHtml).join("") || `<div class="kcol-empty">ลากงานมาวางที่นี่</div>`}
       </div>
     </div>`;
-  }).join("");
+  }).join("") + cancelledColHtml(jobs.filter(j=>j.status==="cancelled"));
   bindKanbanEvents();
+  $$("#kanban [data-zoom]").forEach(el=>el.addEventListener("click",e=>{ e.stopPropagation(); openImage(findJob(el.dataset.zoom)); }));
+  imgHydrate(board);
   applyFilterUi();
 }
 let dragJobId=null;
@@ -1122,6 +1407,9 @@ function bindKanbanEvents(){
 }
 function changeStatus(jobId,newStatus,note){
   const j=findJob(jobId); if(!j||j.status===newStatus) return;
+  /* v2: ยกเลิก/กู้คืนต้องผ่านแบบฟอร์มที่บันทึกเหตุผลและผู้ทำรายการเท่านั้น */
+  if(j.status==="cancelled"){ toast(`${j.jobNo} ถูกยกเลิกแล้ว — กู้คืนงานก่อนเปลี่ยนสถานะ`, true); refreshAll(); return; }
+  if(newStatus==="cancelled"){ refreshAll(); openCancelModal(j.id); return; }
   const old=j.status, now=todayIso();
   const last=j.history[j.history.length-1];
   if(last && !last.end) last.end=now;
@@ -1143,6 +1431,10 @@ function fillPersonSelects(){
   $("#user-select").innerHTML=state.db.users.map(u=>`<option value="${u.id}">👤 ${esc(u.name)} (${esc(u.role)})</option>`).join("");
   $("#f-status").innerHTML=`<option value="">สถานะ: ทั้งหมด</option>`+STATUSES.map(s=>`<option value="${s.key}">${esc(s.label)}</option>`).join("");
   $("#dl-customers").innerHTML=[...new Set(state.db.jobs.map(j=>j.customer))].map(c=>`<option value="${esc(c)}">`).join("");
+  /* v2: Merchandiser / R&D (ไม่บังคับ) และรายชื่อลูกค้า */
+  const opt0=`<option value="">— ไม่ระบุ —</option>`;
+  $("#nj-merch").innerHTML=opt0+opts; $("#nj-rd").innerHTML=opt0+opts;
+  $("#dl-custnames").innerHTML=[...new Set(state.db.jobs.map(j=>j.customerName).filter(Boolean))].map(c=>`<option value="${esc(c)}">`).join("");
 }
 function suggestJobNo(){
   const nums=state.db.jobs.map(j=>{ const m=/^MD-(\d+)$/.exec(j.jobNo); return m? +m[1] : 0; });
@@ -1154,17 +1446,31 @@ function newJobOpen(){
   $("#nj-qty").value="0"; $("#nj-sampleqty").value="1";
   $("#nj-start").value=todayIso(); $("#nj-due").value="";
   $("#nj-priority").value="normal"; $("#nj-notes").value="";
+  $("#nj-custname").value=""; $("#nj-merch").value=""; $("#nj-rd").value="";
+  njImageClear();
   openModal("modal-new");
   $("#nj-jobno").focus();
 }
-function newJobSave(){
+async function newJobSave(){
+  if(state.njBusy) return;   /* กันกดซ้ำระหว่างอัปโหลด */
   const jobNo=$("#nj-jobno").value.trim(), customer=$("#nj-customer").value.trim(),
         product=$("#nj-product").value.trim(), due=$("#nj-due").value;
   if(!jobNo||!customer||!product||!due){ toast("กรอก Job No. / เซลเจ้าของงาน / Product / Due Date ให้ครบ", true); return; }
   if(state.db.jobs.some(j=>j.jobNo.toLowerCase()===jobNo.toLowerCase())){ toast(`Job No. ${jobNo} มีอยู่แล้ว`, true); return; }
   const start=$("#nj-start").value||todayIso();
+  const id=uid("job");
+  /* v2: อัปโหลดรูปก่อน — ถ้าไม่สำเร็จจะไม่สร้างงาน และแจ้งให้ลองใหม่หรือลบรูป */
+  let image=null;
+  if(state.njFile){
+    const btn=$("#nj-save"), st=$("#nj-img-status");
+    state.njBusy=true; btn.disabled=true; btn.textContent="กำลังอัปโหลดรูป…";
+    st.className="imgpick-status small"; st.textContent="กำลังอัปโหลดรูป…";
+    try{ image=await imgUpload(state.njFile,{id,jobNo}); }
+    catch(e){ st.className="imgpick-status small err"; st.textContent=e.message+" — ยังไม่ได้สร้างงาน"; toast("อัปโหลดรูปไม่สำเร็จ — ยังไม่ได้สร้าง Job", true); return; }
+    finally{ state.njBusy=false; btn.disabled=false; btn.textContent="สร้าง Job"; }
+  }
   const j={
-    id:uid("job"), jobNo, customer, product,
+    id, jobNo, customer, product,
     sku:$("#nj-sku").value.trim(), productType:$("#nj-type").value,
     qty:num($("#nj-qty").value), sampleQty:num($("#nj-sampleqty").value), prodQty:num($("#nj-qty").value),
     startDate:start, dueDate:due, priority:$("#nj-priority").value,
@@ -1172,10 +1478,14 @@ function newJobSave(){
     status:"new", history:[{status:"new",start,end:null,by:curUser(),note:""}],
     materials:[], costs:{}, sales:{price:0,qtySold:0},
     qc:{cutting:0,sewing:0,qcPass:0,defect:0,rework:0,completed:0,delivered:0},
-    samples:[], activity:[]
+    samples:[], activity:[],
+    createdAt:new Date().toISOString(), customerName:$("#nj-custname").value.trim(),
+    merchOwner:$("#nj-merch").value, rdOwner:$("#nj-rd").value, image
   };
   logAct(j,"Created Job");
   logAct(j,`Assigned to ${userName(j.responsible)} (${userRole(j.responsible)})`);
+  if(image) logAct(j,"เพิ่มรูปสินค้า: "+image.name);
+  njImageClear();
   state.db.jobs.unshift(j);
   save();
   closeModal("modal-new");
@@ -1187,7 +1497,7 @@ function newJobSave(){
 function searchJobs(q){
   q=q.trim().toLowerCase(); if(!q) return [];
   return state.db.jobs.map(j=>{
-    const fields=[j.jobNo,j.customer,j.product,j.sku,stLabel(j.status),userName(j.responsible)];
+    const fields=[j.jobNo,j.customer,j.product,j.sku,stLabel(j.status),userName(j.responsible),j.customerName];
     const hit=fields.findIndex(f=>String(f||"").toLowerCase().includes(q));
     return hit>=0? {j,score:(j.jobNo.toLowerCase()===q?0:1)+hit*0.1} : null;
   }).filter(Boolean).sort((a,b)=>a.score-b.score).slice(0,12).map(x=>x.j);
@@ -1218,7 +1528,7 @@ function buildNotifs(){
     if(["sampling","sample_revise"].includes(j.status) && stDays>=3) out.push({ic:"🔵",cls:"info",t:`${j.jobNo} — WAITING APPROVAL ${stDays} วัน`,d:`${j.product} · ${stLabel(j.status)}`,id:j.id,w:3});
     if(j.status==="done_prod") out.push({ic:"🟢",cls:"good",t:`${j.jobNo} — ผลิตเสร็จแล้ว รอส่งมอบ`,d:j.product,id:j.id,w:4});
     const qi=qtyIssues(j);
-    if(qi.length && !["closed"].includes(j.status)) out.push({ic:"⚠️",cls:"warn",t:`${j.jobNo} — จำนวนไม่ตรงกัน`,d:qi[0],id:j.id,w:2});
+    if(qi.length && !["closed","cancelled"].includes(j.status)) out.push({ic:"⚠️",cls:"warn",t:`${j.jobNo} — จำนวนไม่ตรงกัน`,d:qi[0],id:j.id,w:2});
   });
   return out.sort((a,b)=>a.w-b.w);
 }
@@ -1251,9 +1561,11 @@ function openJob(id){
 }
 function renderJobDetail(){
   const j=findJob(state.openJobId); if(!j) return;
-  const di=dueInfo(j), st=ST[j.status];
+  const di=dueInfo(j), st=ST[j.status]||{dot:"#8b8d94",label:j.status};
+  const cancelled=j.status==="cancelled";
   $("#jd-header").innerHTML=`<div class="jd-head">
-    <div>
+    ${j.image?`<div class="jd-img" data-zoom="${j.id}" title="ดูรูปขนาดใหญ่" role="button" tabindex="0" aria-label="ดูรูปสินค้า">${imgHtml(j.image.thumbId,j.product)}</div>`:""}
+    <div style="min-width:0">
       <div class="jd-no mono">${esc(j.jobNo)}</div>
       <div class="jd-name">${esc(j.product)}</div>
       <div class="jd-chips">
@@ -1271,20 +1583,32 @@ function renderJobDetail(){
         <b class="num">${jobProgress(j)}%</b>
       </div>
       <div class="small muted mt8">เริ่ม ${fmtDY(j.startDate)} · กำหนดส่ง <b>${fmtDY(j.dueDate)}</b></div>
-      <div class="mt8"><select id="jd-status-select" title="เปลี่ยนสถานะ">${STATUSES.map(s=>`<option value="${s.key}" ${s.key===j.status?"selected":""}>${esc(s.label)}</option>`).join("")}</select></div>
+      <div class="mt8"><select id="jd-status-select" title="${cancelled?"งานที่ยกเลิกเปลี่ยนสถานะไม่ได้ — กู้คืนงานก่อน":"เปลี่ยนสถานะ"}" ${cancelled?"disabled":""}>${STATUSES.filter(s=>s.key!=="cancelled"||cancelled).map(s=>`<option value="${s.key}" ${s.key===j.status?"selected":""}>${esc(s.label)}</option>`).join("")}</select></div>
+      <div class="mt8 jd-actions">
+        <button class="btn sm" id="jd-dash" type="button" title="ดูภาพรวมงานนี้ และ Export PDF">Job Dashboard / PDF</button>
+        ${cancelled?"":`<button class="btn danger sm" id="jd-cancel" type="button" ${userCan("canCancel")?"":`disabled title="ผู้ใช้นี้ไม่มีสิทธิ์ยกเลิกงาน — ติดต่อผู้ดูแลให้เปิดสิทธิ์ในชีต Users"`}>ยกเลิกงาน</button>`}
+      </div>
     </div>
-  </div>`;
+  </div>${cancelled?cancelBannerHtml(j):""}`;
   $("#jd-status-select").addEventListener("change",e=>changeStatus(j.id,e.target.value));
+  $("#jd-dash").addEventListener("click",()=>openJobDashboard(j.id));
+  $("#jd-cancel")?.addEventListener("click",()=>openCancelModal(j.id));
+  $("#jd-restore")?.addEventListener("click",()=>openRestoreModal(j.id));
+  const zoom=$("#jd-header [data-zoom]");
+  if(zoom){ zoom.addEventListener("click",()=>openImage(j)); zoom.addEventListener("keydown",e=>{ if(e.key==="Enter"||e.key===" "){ e.preventDefault(); openImage(j); } }); }
   $$("#jd-tabs .tab").forEach(t=>t.classList.toggle("active",t.dataset.tab===state.jobTab));
   const R={info:jdInfo,timeline:jdTimeline,samples:jdSamples,materials:jdMaterials,costing:jdCosting,sales:jdSales,qty:jdQty,activity:jdActivity};
   $("#jd-body").innerHTML=(R[state.jobTab]||jdInfo)(j);
   bindJdEvents(j);
+  /* v2: งานที่ยกเลิกแล้วเปิดดูได้อย่างเดียว */
+  if(cancelled) $$("#jd-body input, #jd-body select, #jd-body textarea, #jd-body button").forEach(el=>{ el.disabled=true; });
+  imgHydrate($("#jd-header")); imgHydrate($("#jd-body"));
   /* ค่าตอนแสดงฟอร์ม — ใช้เช็คว่าผู้ใช้พิมพ์ค้างอยู่ไหม และบันทึกเฉพาะช่องที่แก้จริงเมื่อทีมอัปเดตงานเดียวกัน */
   state.jdBase=JSON.parse(JSON.stringify(j));
   state.jdSnap=jdFormSnap();
 }
 function jdFormSnap(){
-  return $$("#jd-body input, #jd-body select, #jd-body textarea").map(e=>e.type==="checkbox"?e.checked:e.value).join("\u0001");
+  return $$("#jd-body input:not([type=file]), #jd-body select, #jd-body textarea").map(e=>e.type==="checkbox"?e.checked:e.value).join("\u0001");
 }
 
 /* ---------- Tab: Info ---------- */
@@ -1295,6 +1619,8 @@ function jdInfo(j){
     ${f("เซลเจ้าของงาน",`<input id="ji-customer" list="dl-customers" value="${esc(j.customer)}">`)}
     ${f("Product Name",`<input id="ji-product" value="${esc(j.product)}">`)}
     ${f("SKU",`<input id="ji-sku" class="mono" value="${esc(j.sku)}">`)}
+    <div class="field full"><label for="ji-img-file">Product Image / รูปสินค้า</label>${jdImagePickerHtml(j)}</div>
+    ${f("ลูกค้า (Customer)",`<input id="ji-custname" list="dl-custnames" value="${esc(j.customerName||"")}" placeholder="ชื่อลูกค้า / แบรนด์">`)}
     ${f("Product Type",`<select id="ji-type">${["Shirt","T-Shirt","Polo","Dress","Pants","Skirt","Jacket","Uniform","Other"].map(t=>`<option ${t===j.productType?"selected":""}>${t}</option>`).join("")}</select>`)}
     ${f("Order Quantity (pcs)",`<input id="ji-qty" type="number" min="0" value="${num(j.qty)}">`)}
     ${f("Sample Quantity (pcs)",`<input id="ji-sampleqty" type="number" min="0" value="${num(j.sampleQty)}">`)}
@@ -1303,6 +1629,8 @@ function jdInfo(j){
     ${f("Due Date",`<input id="ji-due" type="date" value="${esc(j.dueDate)}">`)}
     ${f("Priority",`<select id="ji-priority">${[["normal","Normal"],["high","🔥 High"],["low","Low"]].map(([v,l])=>`<option value="${v}" ${v===(j.priority||"normal")?"selected":""}>${l}</option>`).join("")}</select>`)}
     ${f("ผู้รับผิดชอบหลัก",`<select id="ji-person">${state.db.users.map(u=>`<option value="${u.id}" ${u.id===j.responsible?"selected":""}>${esc(u.name)} · ${esc(u.role)}</option>`).join("")}</select>`)}
+    ${f("Merchandiser",ownerSelectHtml("ji-merch",j.merchOwner))}
+    ${f("R&amp;D",ownerSelectHtml("ji-rd",j.rdOwner))}
     <div class="field full"><label>Notes</label><textarea id="ji-notes" rows="2">${esc(j.notes)}</textarea></div>
     <div class="field full"><label>Attachments (ลิงก์ไฟล์ / ชื่อเอกสารอ้างอิง)</label>
       <div class="subtle-list" id="ji-atts">
@@ -1311,10 +1639,10 @@ function jdInfo(j){
       <div class="flex mt8"><input id="ji-att-new" placeholder="เช่น https://drive… หรือ 'Tech pack v2.pdf'" style="flex:1"><button class="btn sm" id="ji-att-add">＋ เพิ่ม</button></div>
     </div>
   </div>
-  <div class="flex mt14" style="justify-content:space-between">
+  ${j.status==="cancelled"? `<div class="muted small mt14">งานที่ยกเลิกแล้วแก้ไขหรือลบไม่ได้ — กู้คืนงานก่อนหากต้องการแก้ไข</div>` : `<div class="flex mt14" style="justify-content:space-between">
     <button class="btn danger sm" id="ji-delete">ลบ Job นี้</button>
     <button class="btn primary" id="ji-save">บันทึกข้อมูลงาน</button>
-  </div>`;
+  </div>`}`;
 }
 function jdInfoSave(j){
   const changes=[], base=state.jdBase||j;
@@ -1336,6 +1664,14 @@ function jdInfoSave(j){
   const np=$("#ji-person").value;
   if(np!==base.responsible && np!==j.responsible){ j.responsible=np; changes.push("ผู้รับผิดชอบ"); logAct(j,`Assigned to ${userName(np)} (${userRole(np)})`); }
   setIf("notes",$("#ji-notes").value.trim(),"Notes");
+  /* v2: ช่องใหม่ — งานเก่าไม่มีค่า (undefined) ถือว่าเท่ากับค่าว่าง จะได้ไม่นับเป็นการแก้ไข */
+  const setOpt=(key,val,label)=>{
+    if((base[key]??"")===val) return;
+    if((j[key]??"")!==val){ j[key]=val; changes.push(label); }
+  };
+  setOpt("customerName",$("#ji-custname").value.trim(),"ลูกค้า");
+  setOpt("merchOwner",$("#ji-merch").value,"Merchandiser");
+  setOpt("rdOwner",$("#ji-rd").value,"R&D");
   if(changes.length){ logAct(j,"แก้ไขข้อมูลงาน: "+changes.join(", ")); save(); toast("บันทึกแล้ว"); }
   else toast("ไม่มีการเปลี่ยนแปลง");
 }
@@ -1543,7 +1879,9 @@ function bindJdEvents(j){
     body.querySelectorAll("[data-del-att]").forEach(b=>b.addEventListener("click",()=>{
       const a=j.attachments.splice(+b.dataset.delAtt,1)[0]; logAct(j,"ลบไฟล์แนบ: "+a); save();
     }));
+    bindJdImagePicker(j);
     $("#ji-delete")?.addEventListener("click",()=>{
+      if(j.status==="cancelled"){ toast("งานที่ยกเลิกแล้วลบไม่ได้", true); return; }
       if(!confirm(`ลบ ${j.jobNo} — ${j.product} ถาวร?\nข้อมูลต้นทุน/ยอดขาย/ประวัติทั้งหมดของงานนี้จะหายไป`)) return;
       state.db.jobs=state.db.jobs.filter(x=>x.id!==j.id);
       closeModal("modal-job"); save(); toast(`ลบ ${j.jobNo} แล้ว`);
@@ -1639,10 +1977,9 @@ function kpiHtml(label,value,sub,tone,drillKey){
 /* ================= MAIN DASHBOARD ================= */
 function renderDashboard(){
   const jobs=state.db.jobs;
-  const active=jobs.filter(j=>!["delivered","closed"].includes(j.status));
-  const completed=jobs.filter(j=>["delivered","closed"].includes(j.status));
-  const overdue=jobs.filter(j=>dueInfo(j).state==="overdue");
-  const duesoon=jobs.filter(j=>dueInfo(j).state==="duesoon");
+  /* v2: นับตามหลักเกณฑ์เดียวกับ Business Dashboard — งานที่ยกเลิกแยกออกมา ไม่นับเป็น Active/Overdue */
+  const b=jobBuckets(jobs);
+  const active=b.active, completed=b.completed, overdue=b.overdue, duesoon=b.duesoon;
   const high=active.filter(j=>j.priority==="high");
   $("#dash-kpis").innerHTML=
     kpiHtml("Total Jobs",jobs.length,"ทั้งหมดในระบบ","","all")+
@@ -1650,7 +1987,8 @@ function renderDashboard(){
     kpiHtml("Completed",completed.length,"ส่งมอบ / ปิดงานแล้ว","tone-good","completed")+
     kpiHtml("🔴 Overdue",overdue.length,"เกินกำหนดส่ง",overdue.length?"tone-critical":"","overdue")+
     kpiHtml("⚠ Due Soon",duesoon.length,"ครบกำหนดใน 3 วัน",duesoon.length?"tone-warn":"","duesoon")+
-    kpiHtml("🔥 High Priority",high.length,"งานเร่งด่วนที่ยังไม่จบ",high.length?"tone-warn":"","high");
+    kpiHtml("🔥 High Priority",high.length,"งานเร่งด่วนที่ยังไม่จบ",high.length?"tone-warn":"","high")+
+    kpiHtml("⊘ Cancelled",b.cancelled.length,"ยกเลิกแล้ว · ไม่นับเป็น Active","tone-cancel","cancelled");
   bindDrill($("#dash-kpis"));
 
   /* workflow bars */
@@ -1692,14 +2030,16 @@ function renderDashboard(){
 function bindDrill(root){
   root.querySelectorAll("[data-drill]").forEach(k=>{
     const go=()=>{
-      const jobs=state.db.jobs, key=k.dataset.drill;
+      const jobs=state.db.jobs, key=k.dataset.drill, b=jobBuckets(jobs);
       const sets={
         all:[jobs,"งานทั้งหมด"],
-        active:[jobs.filter(j=>!["delivered","closed"].includes(j.status)),"Active Jobs"],
-        completed:[jobs.filter(j=>["delivered","closed"].includes(j.status)),"Completed"],
-        overdue:[jobs.filter(j=>dueInfo(j).state==="overdue"),"🔴 Overdue"],
-        duesoon:[jobs.filter(j=>dueInfo(j).state==="duesoon"),"⚠ Due Soon"],
-        high:[jobs.filter(j=>j.priority==="high"&&!["delivered","closed"].includes(j.status)),"🔥 High Priority"]
+        active:[b.active,"Active Jobs · กำลังดำเนินการ"],
+        completed:[b.completed,"Completed · เสร็จแล้ว"],
+        overdue:[b.overdue,"🔴 Overdue · ล่าช้า"],
+        duesoon:[b.duesoon,"⚠ Due Soon · ใกล้ถึงกำหนด"],
+        high:[b.active.filter(j=>j.priority==="high"),"🔥 High Priority"],
+        waiting:[b.waiting,"รอข้อมูล / รออนุมัติ"],
+        cancelled:[b.cancelled,"⊘ งานที่ยกเลิก"]
       };
       const [list,title]=sets[key]||[[],key];
       openDrill(title,list);
@@ -1731,6 +2071,11 @@ function jobRefDate(j){
   return (del&&del.start)||j.dueDate||j.startDate;
 }
 function renderBusiness(){
+  /* v2: เลือกดูภาพรวมทั้งหมด หรือราย Job */
+  $$("#biz-mode button").forEach(b=>b.classList.toggle("active",b.dataset.m===state.bizMode));
+  $("#biz-overall").hidden=state.bizMode==="job"; $("#biz-job").hidden=state.bizMode!=="job";
+  if(state.bizMode==="job"){ renderJobDash(); return; }
+  renderBizStatus();
   const [s,e,label]=periodRange(state.bizPeriod);
   $("#biz-period-label").textContent=label;
   $$("#biz-period button").forEach(b=>b.classList.toggle("active",b.dataset.p===state.bizPeriod));
@@ -1739,7 +2084,10 @@ function renderBusiness(){
     const d=parseD(jobRefDate(j)); if(!d) return false;
     return d>=new Date(s.getFullYear(),s.getMonth(),s.getDate()) && d<=new Date(e.getFullYear(),e.getMonth(),e.getDate(),23,59,59);
   };
-  const jobs=state.db.jobs.filter(inRange);
+  /* v2: ยอดขาย/ต้นทุน/กำไร ไม่รวมงานที่ยกเลิก — แสดงแยกเป็นหมายเหตุ */
+  const cxIn=state.db.jobs.filter(j=>j.status==="cancelled").filter(inRange);
+  $("#biz-cancel-note").textContent= cxIn.length? `ไม่รวมงานที่ยกเลิก ${cxIn.length} งาน (ต้นทุนที่บันทึกไว้ ${money(cxIn.reduce((x,j)=>x+totalCost(j),0))} ฿)` : "ไม่รวมงานที่ยกเลิก";
+  const jobs=state.db.jobs.filter(j=>j.status!=="cancelled").filter(inRange);
   const withSales=jobs.filter(j=>totalSales(j)>0);
   const sales=jobs.reduce((x,j)=>x+totalSales(j),0);
   const cost=jobs.reduce((x,j)=>x+totalCost(j),0);
@@ -1760,6 +2108,7 @@ function renderBusiness(){
   /* monthly grouped bars (SVG) over all data */
   const byMonth={};
   state.db.jobs.forEach(j=>{
+    if(j.status==="cancelled") return;
     const d=parseD(jobRefDate(j)); if(!d) return;
     const k=d.getFullYear()+"-"+String(d.getMonth()+1).padStart(2,"0");
     (byMonth[k]=byMonth[k]||{sales:0,cost:0}); byMonth[k].sales+=totalSales(j); byMonth[k].cost+=totalCost(j);
@@ -1872,7 +2221,7 @@ function renderPerformance(){
   bindDrill($("#perf-kpis2"));
 
   /* stage time bars */
-  const stages=STATUSES.filter(s=>!["new","closed"].includes(s.key)).map(s=>({...s,...stageAvg(s.key)}));
+  const stages=STATUSES.filter(s=>!["new","closed","cancelled"].includes(s.key)).map(s=>({...s,...stageAvg(s.key)}));
   const maxAvg=Math.max(...stages.map(s=>s.avg),1);
   $("#perf-stage-time").innerHTML=stages.map(s=>`<div class="bar-h-row">
     <span class="lbl">${esc(s.label)}</span>
@@ -1908,6 +2257,10 @@ const gsState={ key:"", base:{}, rev:{}, failed:{}, lastPull:0, chain:Promise.re
   syncQueued:null, fails:0, error:"", locked:false, connected:false, polling:false, renderLater:false, conflictRounds:0 };
 
 function gsEnabled(){ return typeof window.GSHEET_API==="string" && /^https:\/\//.test(window.GSHEET_API.trim()); }
+/* URL ที่ใช้เรียกจริง: บัญชี Google Workspace ได้ลิงก์แบบ /a/macros/<โดเมน>/ ซึ่งบังคับล็อกอิน — ตัดส่วนนั้นออก */
+function gsUrl(){ return window.GSHEET_API.trim().replace(/^https:\/\/script\.google\.com\/a\/(?:macros\/)?[^/]+\/(?:macros\/)?s\//, "https://script.google.com/macros/s/"); }
+/* ลิงก์ที่ถูกต้องคือ Web app URL จากหน้าต่าง Deploy (ลงท้าย /exec) ไม่ใช่ลิงก์จากแถบที่อยู่ตอนเปิดทดสอบ */
+function gsUrlOk(){ return /^https:\/\/script\.google\.com\/macros\/s\/[\w-]+\/exec$/.test(gsUrl()); }
 
 /* JSON ที่เรียง key เสมอ — ใช้เทียบว่างานเปลี่ยนไหม */
 function gsCanon(v){
@@ -1920,7 +2273,7 @@ async function gsApi(action, body){
   const ctl=new AbortController(), timer=setTimeout(()=>ctl.abort(), 30000);
   try{
     /* text/plain = ไม่มี CORS preflight (Apps Script ไม่รองรับ OPTIONS) */
-    const res=await fetch(window.GSHEET_API.trim(), { method:"POST", cache:"no-store", signal:ctl.signal,
+    const res=await fetch(gsUrl(), { method:"POST", cache:"no-store", signal:ctl.signal,
       headers:{"Content-Type":"text/plain;charset=utf-8"},
       body:JSON.stringify(Object.assign({}, body, {action, key:gsState.key})) });
     if(!res.ok) throw gsErr("http_"+res.status);
@@ -1998,13 +2351,34 @@ function gsMerge3(baseStr, local, remote){
 }
 /* แทนค่าในวัตถุเดิม — ฟอร์มที่เปิดอยู่ยังชี้ไปที่งานเดียวกัน */
 function gsReplace(target, src){ Object.keys(target).forEach(k=>delete target[k]); Object.assign(target, src); }
+/* v2: ใช้ข้อมูลจาก Sheet ทับของในเครื่องทั้งงาน (ไม่รวม) — ใช้เมื่อ Sheet ปฏิเสธการแก้ไข หรือหลังยกเลิก/กู้คืนงาน */
+function gsForceRemote(it){
+  if(!it || !it.id) return false;
+  const local=gsJobById(it.id);
+  if(it.rev) gsState.rev[it.id]=Math.max(gsState.rev[it.id]||0, it.rev);
+  delete gsState.failed[it.id];
+  if(it.deleted || !it.job){
+    delete gsState.base[it.id];
+    if(!local) return false;
+    state.db.jobs=state.db.jobs.filter(j=>j!==local);
+    return true;
+  }
+  const copy=JSON.parse(JSON.stringify(it.job));
+  if(local) gsReplace(local, copy); else state.db.jobs.unshift(copy);
+  gsState.base[it.id]=gsCanon(copy);
+  return true;
+}
 
 /* คืนค่า true ถ้าข้อมูลบนจอเปลี่ยน */
 function gsApplyRemote(it){
-  if(!it || !it.id || it.rev<=(gsState.rev[it.id]||0)) return false;
-  if(!it.deleted && !it.job) return false;
-  gsState.rev[it.id]=it.rev;
+  if(!it || !it.id) return false;
   const local=gsJobById(it.id);
+  if(it.rev<=(gsState.rev[it.id]||0)){
+    /* เคยได้รับเวอร์ชันนี้แล้ว — ข้าม ยกเว้นงานที่ยังไม่ถูกลบแต่หายไปจากเครื่อง (ข้อมูลในเครื่องไม่ครบ) ให้ดึงกลับมา */
+    if(it.deleted || local || !it.job || gsState.base[it.id]!==undefined) return false;
+  }
+  if(!it.deleted && !it.job) return false;
+  gsState.rev[it.id]=Math.max(gsState.rev[it.id]||0, it.rev);
   if(it.deleted){
     delete gsState.base[it.id];
     if(!local) return false;
@@ -2035,7 +2409,7 @@ function gsApplyUsers(users){
 /* ---------- วาดหน้าจอใหม่หลังได้ข้อมูลจากทีม ---------- */
 function gsRender(ids){
   if(dragJobId){ gsState.renderLater=true; return; }   /* กำลังลากการ์ดอยู่ — รอให้ลากเสร็จก่อน */
-  const keep=["#f-person","#f-status","#nj-person"].map(s=>[s,$(s).value]);
+  const keep=["#f-person","#f-status","#nj-person","#nj-merch","#nj-rd"].map(s=>[s,$(s).value]);
   fillPersonSelects();
   keep.forEach(([s,v])=>{ if(v && [...$(s).options].some(o=>o.value===v)) $(s).value=v; });
   $("#user-select").value=state.currentUser.id;
@@ -2068,6 +2442,11 @@ async function gsPush(){
       retry=true;
     }else if(res.dupJobNo){
       dups.push(res.id);
+    }else if(res.rejected){
+      /* v2: Sheet ไม่รับการแก้ไขนี้ (เช่น งานถูกยกเลิกไปแล้ว) — ใช้ข้อมูลจาก Sheet แทนของในเครื่อง */
+      if(gsForceRemote({id:res.id, rev:res.rev, deleted:res.deleted, job:res.job})) changed.add(res.id);
+      const j=gsJobById(res.id)||{jobNo:res.id};
+      toast(res.rejected==="job_cancelled"? `${j.jobNo} ถูกยกเลิกแล้ว — การแก้ไขล่าสุดไม่ถูกบันทึก` : `${j.jobNo}: ข้อมูลการยกเลิกแก้ได้ผ่านปุ่มยกเลิก/กู้คืนเท่านั้น`, true);
     }else if(res.error && s){
       gsState.failed[res.id]=s.canon;   /* ไม่ส่งซ้ำจนกว่างานนี้จะถูกแก้อีก */
       const j=gsJobById(res.id);
@@ -2156,7 +2535,8 @@ function gsFail(e){
   const code=(e && e.code) || "offline";
   if(code==="unauthorized"){ try{ localStorage.removeItem(LS_GS_KEY); }catch(_){} gsLock("รหัสทีมไม่ถูกต้อง หรือผู้ดูแลเปลี่ยนรหัสแล้ว"); return; }
   if(code==="key_not_set"){ gsState.error="ยังไม่ได้ตั้ง TEAM_KEY ใน Apps Script"; gsChip(); return; }
-  gsState.error = code==="busy"? "Sheet ไม่ว่าง — กำลังลองใหม่"
+  gsState.error = !gsUrlOk()? "URL ของ Apps Script ไม่ถูกต้อง (ต้องลงท้าย /exec)"
+    : code==="busy"? "Sheet ไม่ว่าง — กำลังลองใหม่"
     : /^(http_|bad_response|server_error|unknown_action)/.test(code)? "เชื่อม Apps Script ไม่ได้"
     : "ออฟไลน์";
   gsChip();
@@ -2215,6 +2595,7 @@ async function gsUnlock(){
     gsState.locked=true; gsChip();
     $("#gs-key-err").textContent= err.code==="unauthorized"? "รหัสทีมไม่ถูกต้อง"
       : err.code==="key_not_set"? "ผู้ดูแลยังไม่ได้ตั้ง TEAM_KEY ใน Apps Script"
+      : !gsUrlOk()? "URL ของ Apps Script ในเว็บไม่ถูกต้อง — แจ้งผู้ดูแล (ต้องเป็นลิงก์ที่ลงท้ายด้วย /exec)"
       : "เชื่อมต่อไม่ได้ — ตรวจอินเทอร์เน็ต หรือ URL ของ Apps Script";
     return;
   }
@@ -2245,6 +2626,799 @@ function gsStart(){
 </script>
 <script>
 "use strict";
+/* ================= v2: รูปสินค้า · งานที่ยกเลิก · Job Dashboard · Export PDF =================
+   ข้อมูลใหม่ในแต่ละงาน (งานเก่าที่ไม่มีช่องเหล่านี้ยังใช้ได้ตามเดิม):
+     image {id, thumbId, name, type, size, width, height, uploadedAt, uploadedBy}  — ไฟล์อยู่ใน Google Drive
+     customerName, merchOwner, rdOwner, createdAt
+     cancelledAt, cancelledBy, cancelledById, cancellationReason, cancellationDetails, previousStatus, cancelHistory[]
+   การยกเลิก/กู้คืนในโหมด Google Sheet ทำผ่าน Apps Script (ตรวจ PIN + สิทธิ์) เท่านั้น */
+state.bizMode="overall"; state.bizJobId=null; state.njFile=null; state.njBusy=false; state.njPrevUrl=null;
+const NO_DATA="ยังไม่มีข้อมูล";
+const CANCEL_REASONS=["ลูกค้ายกเลิกคำสั่งซื้อ","ลูกค้าเปลี่ยนแบบหรือเปลี่ยนความต้องการ","งบประมาณไม่ผ่าน","ต้นทุนการผลิตสูงเกินไป",
+  "ไม่สามารถส่งมอบได้ทันกำหนด","วัตถุดิบไม่พร้อมหรือหาไม่ได้","ปัญหาคุณภาพหรือตัวอย่างไม่ผ่าน","ยกเลิกโดย Sales","ยกเลิกโดยฝ่ายบริหาร","อื่น ๆ"];
+const WAIT_KEYS=["new","sampling","sample_revise"];
+const COUNT_RULES=[
+  "<b>งานทั้งหมด</b> = ทุกงานที่ยังไม่ถูกลบ รวมงานที่ยกเลิก",
+  "<b>กำลังดำเนินการ</b> = ทุกสถานะ ยกเว้น ส่งมอบ · ปิดงาน · ยกเลิกงาน (รวม “ผลิตเสร็จ” ที่ยังไม่ส่งมอบ)",
+  "<b>เสร็จแล้ว</b> = สถานะ ส่งมอบ หรือ ปิดงาน",
+  "<b>ใกล้ถึงกำหนด</b> = งานที่กำลังดำเนินการ และกำหนดส่งอยู่ภายใน 0–3 วันนับจากวันนี้",
+  "<b>ล่าช้า</b> = งานที่กำลังดำเนินการ และเลยกำหนดส่งแล้ว",
+  "<b>รอข้อมูล / รออนุมัติ</b> = สถานะ NEW JOB (รอข้อมูลเริ่มงาน) · กำลังขึ้นตัวอย่าง · แก้ไขตัวอย่าง (รอลูกค้าอนุมัติตัวอย่าง)",
+  "<b>ยกเลิก</b> = สถานะ ยกเลิกงาน — ไม่นับเป็นงานที่กำลังดำเนินการ งานเสร็จ หรืองานล่าช้า",
+  "<b>ยอดขาย · ต้นทุน · กำไร</b> = ไม่รวมงานที่ยกเลิก และกรองตามช่วงเวลาที่เลือก (อ้างอิงวันส่งมอบ หรือกำหนดส่ง)"
+];
+const ACT_ERR={bad_pin:"PIN ไม่ถูกต้อง",pin_not_set:"ผู้ใช้นี้ยังไม่มี PIN — ให้ผู้ดูแลใส่ PIN ในชีต Users",
+  forbidden:"ผู้ใช้นี้ไม่มีสิทธิ์ทำรายการนี้ — ให้ผู้ดูแลเปิดสิทธิ์ในชีต Users",user_not_found:"ไม่พบชื่อผู้ใช้นี้ในชีต Users",
+  reason_required:"กรุณาระบุเหตุผล",details_required:"เลือก “อื่น ๆ” ต้องกรอกรายละเอียดเพิ่มเติม",not_found:"ไม่พบงานนี้ในฐานข้อมูล",
+  not_cancelled:"งานนี้ไม่ได้อยู่ในสถานะยกเลิกแล้ว",bad_status:"สถานะปลายทางไม่ถูกต้อง",busy:"ระบบไม่ว่าง ลองใหม่อีกครั้ง",
+  unauthorized:"รหัสทีมไม่ถูกต้อง",unknown_action:"Apps Script ยังเป็นเวอร์ชันเก่า — ให้ผู้ดูแลอัปเดต Code.gs และ Deploy เวอร์ชันใหม่"};
+const PH_SVG=`<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round" aria-hidden="true"><path d="M8 3 3.5 5.5 2 10l3 1.5V21h14v-9.5L22 10l-1.5-4.5L16 3c-.6 1.4-2.2 2.4-4 2.4S8.6 4.4 8 3Z"/></svg>`;
+
+/* ---------- เวลาไทย (Asia/Bangkok ไม่มีเวลาออมแสง) ---------- */
+const p2=n=>String(n).padStart(2,"0");
+function bkkParts(v){
+  if(v===null||v===undefined||v==="") return null;
+  const t=typeof v==="number"? v : Date.parse(v); if(!isFinite(t)) return null;
+  const d=new Date(t+7*3600e3);
+  return {y:d.getUTCFullYear(),m:d.getUTCMonth(),d:d.getUTCDate(),h:d.getUTCHours(),mi:d.getUTCMinutes()};
+}
+function fmtBkk(v){ const p=bkkParts(v); return p? `${p.d} ${TH_M[p.m]} ${(p.y+543)%100} ${p2(p.h)}:${p2(p.mi)}` : NO_DATA; }
+function fmtBkkD(v){ const p=bkkParts(v); return p? `${p.d} ${TH_M[p.m]} ${(p.y+543)%100}` : NO_DATA; }
+function fmtBkkLong(v){ const p=bkkParts(v); return p? `${p.d} ${TH_M_FULL[p.m]} ${p.y+543} เวลา ${p2(p.h)}:${p2(p.mi)} น.` : NO_DATA; }
+function bkkIso(v){ const p=bkkParts(v); return p? `${p.y}-${p2(p.m+1)}-${p2(p.d)}` : ""; }
+
+/* ---------- ข้อมูลช่วย ---------- */
+function userNameOr(id){ const u=id&&state.db.users.find(x=>x.id===id); return u? u.name : ""; }
+function userCan(perm){ return state.mode!=="sheets" || !!(state.currentUser && state.currentUser[perm]); }
+function ownerSelectHtml(id,val){
+  const known=!val||state.db.users.some(u=>u.id===val);
+  return `<select id="${id}"><option value="">— ไม่ระบุ —</option>${known?"":`<option value="${esc(val)}" selected>ไม่พบผู้ใช้ (${esc(val)})</option>`}${state.db.users.map(u=>`<option value="${u.id}" ${u.id===val?"selected":""}>${esc(u.name)} · ${esc(u.role)}</option>`).join("")}</select>`;
+}
+function jobCreatedAt(j){
+  if(j.createdAt) return j.createdAt;
+  const a=(j.activity||[]).find(x=>/^Created Job/.test(x.action||""));
+  return a? a.ts : null;
+}
+function jobActualStart(j){ const h=(j.history||[]).find(x=>x.status!=="new"); return h? h.start : null; }
+function fmtSize(b){ return b>=1048576? (b/1048576).toFixed(1)+" MB" : Math.max(1,Math.round(b/1024))+" KB"; }
+/* หลักเกณฑ์การนับเดียวกันทุกหน้า (Dashboard, Business) */
+function jobBuckets(jobs){
+  const b={all:jobs,cancelled:[],completed:[],active:[],overdue:[],duesoon:[],waiting:[]};
+  jobs.forEach(j=>{
+    if(j.status==="cancelled"){ b.cancelled.push(j); return; }
+    if(["delivered","closed"].includes(j.status)){ b.completed.push(j); return; }
+    b.active.push(j);
+    const di=dueInfo(j);
+    if(di.state==="overdue") b.overdue.push(j); else if(di.state==="duesoon") b.duesoon.push(j);
+    if(WAIT_KEYS.includes(j.status)) b.waiting.push(j);
+  });
+  return b;
+}
+
+/* ================= รูปสินค้า =================
+   อัปโหลด: ตรวจขนาด (≤ 5 MB) และชนิดไฟล์จากเนื้อไฟล์จริง → ย่อเป็นรูปเต็ม 1600px + รูปย่อ 480px → Apps Script เก็บใน Google Drive
+   แสดงผล: ดึงผ่าน API (ต้องมีรหัสทีม) แล้วเก็บไว้ในเครื่อง (IndexedDB) — ไม่มีลิงก์สาธารณะ */
+const IMG_TYPES=["image/jpeg","image/png","image/webp"], IMG_MAX=5*1024*1024;
+const IMG={urls:new Map(),want:new Set(),inflight:new Set(),failed:new Set(),timer:null,db:null};
+function imgDb(){
+  if(IMG.db) return IMG.db;
+  IMG.db=new Promise(res=>{
+    try{ const rq=indexedDB.open("gf-images",1); rq.onupgradeneeded=()=>rq.result.createObjectStore("blobs"); rq.onsuccess=()=>res(rq.result); rq.onerror=()=>res(null); }
+    catch(e){ res(null); }
+  });
+  return IMG.db;
+}
+async function imgDbGet(id){
+  const db=await imgDb(); if(!db) return null;
+  return new Promise(res=>{ try{ const rq=db.transaction("blobs").objectStore("blobs").get(id); rq.onsuccess=()=>res(rq.result||null); rq.onerror=()=>res(null); }catch(e){ res(null); } });
+}
+async function imgDbPut(id,blob){
+  const db=await imgDb(); if(!db) return;
+  return new Promise(res=>{ try{ const tx=db.transaction("blobs","readwrite"); tx.objectStore("blobs").put(blob,id); tx.oncomplete=()=>res(); tx.onerror=()=>res(); }catch(e){ res(); } });
+}
+function imgSetBlob(id,blob){ if(IMG.urls.has(id)) return IMG.urls.get(id); const u=URL.createObjectURL(blob); IMG.urls.set(id,u); return u; }
+function imgUrl(id){ return id? IMG.urls.get(id)||"" : ""; }
+function b64ToBlob(b64,type){ const bin=atob(b64), u=new Uint8Array(bin.length); for(let i=0;i<bin.length;i++) u[i]=bin.charCodeAt(i); return new Blob([u],{type:type||"image/jpeg"}); }
+function blobToB64(blob){ return new Promise((res,rej)=>{ const r=new FileReader(); r.onload=()=>res(String(r.result).split(",")[1]||""); r.onerror=()=>rej(r.error); r.readAsDataURL(blob); }); }
+/* กล่องรูป: none = ไม่มีรูป · loading · ok · broken = โหลดไม่ได้ (แสดง placeholder แทนรูปแตก) */
+function imgHtml(id,alt,cls){
+  const u=imgUrl(id), st=!id?"none":IMG.failed.has(id)?"broken":u?"ok":"loading";
+  return `<span class="gf-img ${cls||""}" data-state="${st}">${id&&st!=="broken"?`<img data-img="${esc(id)}" alt="${esc(alt||"รูปสินค้า")}" draggable="false"${u?` src="${u}"`:""}>`:""}<span class="gf-ph" aria-hidden="true">${PH_SVG}<i></i></span></span>`;
+}
+function imgHydrate(root){
+  (root||document).querySelectorAll("img[data-img]:not([src])").forEach(el=>IMG.want.add(el.dataset.img));
+  if(IMG.want.size && !IMG.timer) IMG.timer=setTimeout(imgPump,30);
+}
+async function imgPump(){
+  IMG.timer=null;
+  const ids=[...IMG.want].filter(id=>!IMG.urls.has(id)&&!IMG.inflight.has(id)&&!IMG.failed.has(id)); IMG.want.clear();
+  const remote=[];
+  for(const id of ids){ const b=await imgDbGet(id); if(b){ imgSetBlob(id,b); imgApply(id); } else remote.push(id); }
+  if(!remote.length) return;
+  if(state.mode!=="sheets"){ remote.forEach(id=>{ IMG.failed.add(id); imgApply(id); }); return; }
+  if(!gsState.key || gsState.locked) return;
+  for(let i=0;i<remote.length;i+=8){
+    const part=remote.slice(i,i+8); part.forEach(id=>IMG.inflight.add(id));
+    try{
+      const r=await gsApi("image",{ids:part});
+      part.forEach(id=>{
+        const x=r.images&&r.images[id];
+        if(x&&x.data){ const blob=b64ToBlob(x.data,x.type); imgDbPut(id,blob); imgSetBlob(id,blob); } else IMG.failed.add(id);
+        imgApply(id);
+      });
+    }catch(e){ /* ออฟไลน์ — จะลองใหม่ตอนวาดหน้าจอรอบหน้า */ }
+    finally{ part.forEach(id=>IMG.inflight.delete(id)); }
+  }
+}
+function imgApply(id){
+  document.querySelectorAll(`img[data-img="${CSS.escape(id)}"]`).forEach(el=>{
+    const box=el.closest(".gf-img");
+    if(IMG.failed.has(id)){ if(box) box.dataset.state="broken"; el.remove(); return; }
+    const u=imgUrl(id); if(u && el.getAttribute("src")!==u) el.src=u;
+  });
+}
+document.addEventListener("load",e=>{ const el=e.target; if(el&&el.tagName==="IMG"&&el.dataset&&el.dataset.img){ const box=el.closest(".gf-img"); if(box) box.dataset.state="ok"; } },true);
+document.addEventListener("error",e=>{ const el=e.target; if(el&&el.tagName==="IMG"&&el.dataset&&el.dataset.img){ IMG.failed.add(el.dataset.img); const box=el.closest(".gf-img"); if(box) box.dataset.state="broken"; el.remove(); } },true);
+/* คืน URL ของรูป (โหลดจากเครื่องหรือจาก Sheet) หรือ "" ถ้าโหลดไม่ได้ */
+async function imgEnsure(id){
+  if(!id) return "";
+  if(IMG.urls.has(id)) return IMG.urls.get(id);
+  const b=await imgDbGet(id); if(b) return imgSetBlob(id,b);
+  if(state.mode!=="sheets") return "";
+  try{
+    const r=await gsApi("image",{ids:[id]}); const x=r.images&&r.images[id];
+    if(x&&x.data){ const blob=b64ToBlob(x.data,x.type); imgDbPut(id,blob); return imgSetBlob(id,blob); }
+  }catch(e){}
+  return "";
+}
+async function imgSniff(file){
+  const b=new Uint8Array(await file.slice(0,12).arrayBuffer());
+  if(b[0]===0xFF&&b[1]===0xD8&&b[2]===0xFF) return "image/jpeg";
+  if(b[0]===0x89&&b[1]===0x50&&b[2]===0x4E&&b[3]===0x47) return "image/png";
+  if(b[0]===0x52&&b[1]===0x49&&b[2]===0x46&&b[3]===0x46&&b[8]===0x57&&b[9]===0x45&&b[10]===0x42&&b[11]===0x50) return "image/webp";
+  return "";
+}
+async function imgCheck(file){
+  if(!file) return "ไม่พบไฟล์";
+  if(!file.size) return "ไฟล์ว่างเปล่า";
+  if(file.size>IMG_MAX) return `ไฟล์ใหญ่เกิน 5 MB (ไฟล์นี้ ${fmtSize(file.size)})`;
+  if(file.type && !IMG_TYPES.includes(file.type)) return "รองรับเฉพาะรูป JPG, PNG หรือ WEBP";
+  if(!(await imgSniff(file))) return "ไฟล์นี้ไม่ใช่รูป JPG, PNG หรือ WEBP จริง (ตรวจจากเนื้อไฟล์)";
+  return "";
+}
+async function imgResize(file,max,q){
+  let src;
+  try{ src=await createImageBitmap(file); }
+  catch(e){ src=await new Promise((res,rej)=>{ const im=new Image(); im.onload=()=>res(im); im.onerror=()=>rej(new Error("decode")); im.src=URL.createObjectURL(file); }); }
+  const w=src.width, h=src.height, s=Math.min(1,max/Math.max(w,h));
+  const c=document.createElement("canvas"); c.width=Math.max(1,Math.round(w*s)); c.height=Math.max(1,Math.round(h*s));
+  const x=c.getContext("2d"); x.fillStyle="#ffffff"; x.fillRect(0,0,c.width,c.height); x.drawImage(src,0,0,c.width,c.height);
+  const blob=await new Promise(res=>c.toBlob(res,"image/jpeg",q));
+  if(!blob) throw new Error("encode");
+  return {blob,w,h};
+}
+async function imgUpload(file,job){
+  const err=await imgCheck(file); if(err) throw new Error(err);
+  let full, thumb;
+  try{ full=await imgResize(file,1600,.86); thumb=await imgResize(file,480,.8); }
+  catch(e){ throw new Error("เปิดไฟล์รูปไม่ได้ — ไฟล์อาจเสียหาย"); }
+  let id, thumbId;
+  if(state.mode==="sheets"){
+    let r;
+    try{ r=await gsApi("upload",{jobId:job.id, jobNo:job.jobNo, name:file.name, user:curUser(), data:await blobToB64(full.blob), thumb:await blobToB64(thumb.blob)}); }
+    catch(e){
+      const c=e&&e.code;
+      throw new Error(c==="too_large"?"ไฟล์ใหญ่เกินกำหนด":c==="bad_type"||c==="bad_image"?"ชนิดไฟล์ไม่ถูกต้อง":c==="unknown_action"?ACT_ERR.unknown_action:c==="unauthorized"?"รหัสทีมไม่ถูกต้อง":"อัปโหลดไม่สำเร็จ — ตรวจอินเทอร์เน็ตแล้วลองใหม่");
+    }
+    id=r.id; thumbId=r.thumbId;
+  }else{ id=uid("img"); thumbId=uid("img"); }
+  await imgDbPut(id,full.blob); await imgDbPut(thumbId,thumb.blob);
+  imgSetBlob(id,full.blob); imgSetBlob(thumbId,thumb.blob);
+  return {id, thumbId, name:file.name, type:file.type||"", size:file.size, width:full.w, height:full.h, uploadedAt:new Date().toISOString(), uploadedBy:curUser()};
+}
+async function openImage(job){
+  if(!job||!job.image) return;
+  $("#img-title").textContent=`${job.jobNo} · ${job.product}`;
+  const box=$("#img-view"); box.innerHTML=imgHtml(job.image.thumbId,job.product); imgHydrate(box);
+  openModal("modal-img");
+  const u=await imgEnsure(job.image.id);
+  if(!$("#modal-img").classList.contains("open")) return;
+  if(u) box.innerHTML=`<img src="${u}" alt="${esc(job.product)}" class="img-full">`;
+  else box.insertAdjacentHTML("beforeend",`<div class="muted small">โหลดรูปขนาดเต็มไม่ได้ — แสดงรูปย่อแทน</div>`);
+}
+function cardImgHtml(j){
+  const id=j.image&&j.image.thumbId;
+  return `<div class="jcard-imgwrap"${id?` data-zoom="${j.id}" title="ดูรูปขนาดใหญ่"`:""}>${imgHtml(id,j.product)}</div>`;
+}
+/* --- New Job: เลือกรูปไว้ก่อน แล้วอัปโหลดตอนกด “สร้าง Job” --- */
+function njImageClear(){
+  if(state.njPrevUrl){ URL.revokeObjectURL(state.njPrevUrl); state.njPrevUrl=null; }
+  state.njFile=null; $("#nj-img-file").value="";
+  $("#nj-img-prev").innerHTML=imgHtml("","");
+  $("#nj-img-name").textContent="ยังไม่ได้เลือกรูป"; $("#nj-img-pick").textContent="อัปโหลดรูป"; $("#nj-img-remove").hidden=true;
+  const st=$("#nj-img-status"); st.className="imgpick-status small"; st.textContent="";
+}
+async function njImageChosen(file){
+  const st=$("#nj-img-status"); st.className="imgpick-status small"; st.textContent="กำลังตรวจไฟล์…";
+  const err=await imgCheck(file);
+  if(err){ st.className="imgpick-status small err"; st.textContent=err; $("#nj-img-file").value=""; return; }
+  if(state.njPrevUrl) URL.revokeObjectURL(state.njPrevUrl);
+  state.njFile=file; state.njPrevUrl=URL.createObjectURL(file);
+  $("#nj-img-prev").innerHTML=`<span class="gf-img" data-state="ok"><img src="${state.njPrevUrl}" alt="ตัวอย่างรูปสินค้า"></span>`;
+  $("#nj-img-name").textContent=`${file.name} · ${fmtSize(file.size)}`;
+  $("#nj-img-pick").textContent="เปลี่ยนรูป"; $("#nj-img-remove").hidden=false;
+  st.className="imgpick-status small ok"; st.textContent="พร้อมอัปโหลดเมื่อกด “สร้าง Job”";
+}
+/* --- Job Detail: เปลี่ยน/ลบรูป บันทึกทันที --- */
+function jdImagePickerHtml(j){
+  const img=j.image, ro=j.status==="cancelled";
+  return `<div class="imgpick">
+    ${img?`<span data-zoom-jd role="button" tabindex="0" title="ดูรูปขนาดใหญ่" style="cursor:zoom-in">${imgHtml(img.thumbId,j.product)}</span>`:imgHtml("","")}
+    <div class="imgpick-side">
+      <div class="imgpick-name">${img? esc(img.name||"รูปสินค้า")+(img.size?` · ${fmtSize(img.size)}`:"") : "ยังไม่มีรูปสินค้า"}</div>
+      ${img?`<div class="small muted">อัปโหลด ${esc(fmtBkk(img.uploadedAt))}${img.uploadedBy?` โดย ${esc(img.uploadedBy)}`:""}</div>`:""}
+      ${ro?"":`<div class="flex" style="flex-wrap:wrap"><label class="btn sm" for="ji-img-file" id="ji-img-pick" tabindex="0" role="button">${img?"เปลี่ยนรูป":"อัปโหลดรูป"}</label>${img?`<button class="btn ghost sm" type="button" id="ji-img-remove">ลบรูป</button>`:""}</div>
+      <input type="file" id="ji-img-file" accept="image/jpeg,image/png,image/webp" hidden>
+      <div class="small muted">JPG, PNG หรือ WEBP · ไม่เกิน 5 MB · บันทึกทันทีเมื่อเลือกรูป</div>`}
+      <div class="imgpick-status small" id="ji-img-status" role="status"></div>
+    </div>
+  </div>`;
+}
+async function jdImageChange(j,file){
+  if(jdFormSnap()!==state.jdSnap) jdInfoSave(j);   /* บันทึกช่องที่พิมพ์ค้างไว้ก่อน ไม่ให้หายตอนฟอร์มวาดใหม่ */
+  const setSt=(cls,t)=>{ const el=$("#ji-img-status"); if(el){ el.className="imgpick-status small "+cls; el.textContent=t; } };
+  const lock=on=>$$("#ji-img-pick,#ji-img-remove").forEach(b=>{ b.style.pointerEvents=on?"none":""; b.style.opacity=on?".5":""; });
+  setSt("","กำลังอัปโหลดรูป…"); lock(true);
+  try{
+    const img=await imgUpload(file,{id:j.id,jobNo:j.jobNo});
+    if(j.status==="cancelled") throw new Error("งานถูกยกเลิกระหว่างอัปโหลด — ไม่ได้เปลี่ยนรูป");
+    const had=!!j.image; j.image=img;
+    logAct(j,(had?"เปลี่ยนรูปสินค้า: ":"เพิ่มรูปสินค้า: ")+img.name);
+    save(); toast(had?"เปลี่ยนรูปสินค้าแล้ว":"เพิ่มรูปสินค้าแล้ว");
+  }catch(err){ setSt("err",err.message||"อัปโหลดไม่สำเร็จ"); lock(false); }
+}
+function bindJdImagePicker(j){
+  const zoom=$("#jd-body [data-zoom-jd]");
+  if(zoom){ zoom.addEventListener("click",()=>openImage(j)); zoom.addEventListener("keydown",e=>{ if(e.key==="Enter"||e.key===" "){ e.preventDefault(); openImage(j); } }); }
+  $("#ji-img-pick")?.addEventListener("keydown",e=>{ if(e.key==="Enter"||e.key===" "){ e.preventDefault(); $("#ji-img-file").click(); } });
+  $("#ji-img-file")?.addEventListener("change",e=>{ const file=e.target.files&&e.target.files[0]; if(file) jdImageChange(j,file); });
+  $("#ji-img-remove")?.addEventListener("click",()=>{
+    if(!confirm(`ลบรูปสินค้าของ ${j.jobNo}?`)) return;
+    j.image=null; logAct(j,"ลบรูปสินค้า"); save(); toast("ลบรูปสินค้าแล้ว");
+  });
+}
+
+/* ================= งานที่ยกเลิก: Kanban ================= */
+function cancelCardHtml(j){
+  return `<div class="jcard cancelled" draggable="false" data-id="${j.id}" role="button" tabindex="0" aria-label="${esc(j.jobNo)} ${esc(j.product)} (ยกเลิกแล้ว)">
+    ${cardImgHtml(j)}
+    <div class="jcard-top"><span class="jcard-no mono">${esc(j.jobNo)}</span><span class="jcard-flags"><span class="chip cancel">⊘ ยกเลิก</span></span></div>
+    <div class="jcard-name">${esc(j.product)}</div>
+    <div class="jcard-cx">ยกเลิก ${esc(fmtBkkD(j.cancelledAt))} · โดย ${esc(j.cancelledBy||NO_DATA)}</div>
+    <div class="jcard-cx-r" title="${esc([j.cancellationReason,j.cancellationDetails].filter(Boolean).join(": "))}">เหตุผล: ${esc(j.cancellationReason||NO_DATA)}</div>
+    <div class="jcard-bot"><span class="avatar" title="${esc(userName(j.responsible))}">${esc(userName(j.responsible).slice(0,2))}</span><span class="small muted" style="white-space:nowrap;overflow:hidden;text-overflow:ellipsis">เดิม: ${esc(userName(j.responsible))} · ${esc(j.previousStatus?stLabel(j.previousStatus):NO_DATA)}</span></div>
+  </div>`;
+}
+function cancelledColHtml(list){
+  const s=ST.cancelled;
+  const sorted=[...list].sort((a,b)=>String(b.cancelledAt||"").localeCompare(String(a.cancelledAt||"")));
+  return `<div class="kcol-sep" aria-hidden="true"></div>
+  <div class="kcol kcol-cancel" data-status="cancelled">
+    <div class="kcol-head">
+      <span class="kcol-dot" style="background:${s.dot}"></span>
+      <span class="kcol-title" title="งานที่ยกเลิก — แยกจาก Workflow ปกติ">Cancelled / ยกเลิกงาน</span>
+      <span class="kcol-count num">${list.length}</span>
+    </div>
+    <div class="kcol-body" data-status="cancelled">
+      ${sorted.map(cancelCardHtml).join("") || `<div class="kcol-empty">ลากงานมาที่นี่เพื่อยกเลิก<br>(ต้องมีสิทธิ์ยกเลิกงาน)</div>`}
+    </div>
+  </div>`;
+}
+function cancelBannerHtml(j){
+  return `<div class="cx-banner" role="status">
+    <span class="chip cancel">⊘ ยกเลิกงาน</span>
+    <span>ยกเลิกเมื่อ <b>${esc(fmtBkk(j.cancelledAt))}</b> โดย <b>${esc(j.cancelledBy||NO_DATA)}</b> · เหตุผล <b>${esc(j.cancellationReason||NO_DATA)}</b>${j.cancellationDetails?` — ${esc(j.cancellationDetails)}`:""} · สถานะก่อนยกเลิก: ${esc(j.previousStatus?stLabel(j.previousStatus):NO_DATA)}</span>
+    <span class="spacer"></span>
+    <button class="btn sm" id="jd-restore" type="button" ${userCan("canRestore")?"":`disabled title="ผู้ใช้นี้ไม่มีสิทธิ์กู้คืนงาน — ติดต่อผู้ดูแล"`}>กู้คืนงาน (Restore)</button>
+  </div>`;
+}
+
+/* ================= ยกเลิก / กู้คืนงาน ================= */
+function applyCancelLocal(j,reason,details){   /* โหมดเก็บในเครื่อง — ทำแบบเดียวกับ cancelJob_ ใน Code.gs */
+  const at=new Date().toISOString(), today=todayIso(), prev=j.status, by=curUser(), byId=state.currentUser?state.currentUser.id:"";
+  const last=j.history[j.history.length-1]; if(last&&!last.end) last.end=today;
+  j.history.push({status:"cancelled",start:today,end:null,by,note:reason});
+  Object.assign(j,{status:"cancelled",previousStatus:prev,cancelledAt:at,cancelledBy:by,cancelledById:byId,cancellationReason:reason,cancellationDetails:details});
+  j.cancelHistory=(j.cancelHistory||[]).concat([{type:"cancel",at,by,byId,reason,details,fromStatus:prev}]);
+  logAct(j,"ยกเลิกงาน — "+reason+(details?": "+details:""));
+}
+function applyRestoreLocal(j,to,reason){
+  const at=new Date().toISOString(), today=todayIso(), by=curUser(), byId=state.currentUser?state.currentUser.id:"";
+  const last=j.history[j.history.length-1]; if(last&&!last.end) last.end=today;
+  j.history.push({status:to,start:today,end:null,by,note:"กู้คืน: "+reason});
+  j.status=to;
+  j.cancelHistory=(j.cancelHistory||[]).concat([{type:"restore",at,by,byId,reason,toStatus:to}]);
+  ["cancelledAt","cancelledBy","cancelledById","cancellationReason","cancellationDetails","previousStatus"].forEach(k=>delete j[k]);
+  logAct(j,"กู้คืนงาน → "+stLabel(to)+" — "+reason);
+}
+const CX={jobId:null,step:1,busy:false};
+function openCancelModal(id){
+  const j=findJob(id); if(!j) return;
+  if(j.status==="cancelled"){ toast(`${j.jobNo} ถูกยกเลิกแล้ว`, true); return; }
+  if(!userCan("canCancel")){ toast(`${curUser()} ไม่มีสิทธิ์ยกเลิกงาน — ให้ผู้ดูแลเปิดสิทธิ์ canCancel ในชีต Users`, true); return; }
+  CX.jobId=j.id;
+  $("#cx-jobno").value=j.jobNo; $("#cx-name").value=j.product;
+  $("#cx-reason").innerHTML=`<option value="">— เลือกเหตุผล —</option>`+CANCEL_REASONS.map(r=>`<option>${esc(r)}</option>`).join("");
+  $("#cx-details").value=""; $("#cx-details-req").hidden=true; $("#cx-by").value=curUser(); $("#cx-pin").value="";
+  $("#cx-pin-wrap").hidden=state.mode!=="sheets";
+  cxStep(1); openModal("modal-cancel"); $("#cx-reason").focus();
+}
+function cxStep(n){
+  CX.step=n; $("#cx-err").textContent="";
+  $("#cx-confirm").hidden=n!==2;
+  $$("#cx-reason,#cx-details,#cx-pin").forEach(el=>{ el.disabled=n===2; });
+  $("#cx-next").textContent=n===2?"ยืนยันยกเลิกงาน":"ยกเลิกงาน…"; $("#cx-next").classList.toggle("solid",n===2);
+  $("#cx-back").textContent=n===2?"กลับไปแก้ไข":"ปิด";
+}
+async function cxNext(){
+  if(CX.busy) return;   /* กันกดซ้ำ */
+  const j=findJob(CX.jobId); if(!j){ closeModal("modal-cancel"); return; }
+  const reason=$("#cx-reason").value, details=$("#cx-details").value.trim(), pin=$("#cx-pin").value.trim();
+  const err=t=>{ $("#cx-err").textContent=t; };
+  if(CX.step===1){
+    if(!reason) return err("กรุณาเลือกเหตุผลการยกเลิก");
+    if(reason==="อื่น ๆ" && !details) return err("เลือก “อื่น ๆ” ต้องกรอกรายละเอียดเพิ่มเติม");
+    if(state.mode==="sheets" && !pin) return err("กรุณาใส่ PIN ส่วนตัวเพื่อยืนยันตัวตน");
+    cxStep(2); return;
+  }
+  CX.busy=true;
+  const btn=$("#cx-next"), back=$("#cx-back"); btn.disabled=true; back.disabled=true; btn.textContent="กำลังบันทึก…";
+  try{
+    if(state.mode==="sheets"){
+      /* ส่งงานที่แก้ค้างไว้ก่อน แล้วให้ Apps Script ตรวจ PIN/สิทธิ์และบันทึกการยกเลิก — สำเร็จเมื่อ Sheet ยืนยันเท่านั้น */
+      const r=await gsRun(async()=>{ await gsPush(); return gsApi("cancelJob",{jobId:j.id, userId:state.currentUser&&state.currentUser.id, pin, reason, details}); });
+      gsForceRemote({id:j.id, rev:r.rev, job:r.job}); gsPersist();
+    }else{ applyCancelLocal(j,reason,details); save(); }
+    closeModal("modal-cancel");
+    refreshAll();
+    toast(`ยกเลิก ${j.jobNo} แล้ว — บันทึกเหตุผลและผู้ยกเลิกเรียบร้อย`);
+  }catch(e){
+    const code=e&&e.code;
+    if(code==="already_cancelled" && e.data && e.data.job){
+      gsForceRemote({id:j.id, rev:e.data.rev, job:e.data.job}); gsPersist(); closeModal("modal-cancel"); refreshAll();
+      toast(`${j.jobNo} ถูกยกเลิกไปแล้วโดยผู้อื่น`, true); return;
+    }
+    if(["bad_pin","pin_not_set","forbidden","user_not_found","reason_required","details_required"].includes(code)) cxStep(1);
+    err((ACT_ERR[code]||"บันทึกไม่สำเร็จ — ตรวจอินเทอร์เน็ตแล้วลองใหม่")+" · งานยังไม่ถูกยกเลิก");
+  }finally{
+    CX.busy=false; btn.disabled=false; back.disabled=false;
+    btn.textContent=CX.step===2?"ยืนยันยกเลิกงาน":"ยกเลิกงาน…";
+  }
+}
+const RS={jobId:null,step:1,busy:false};
+function openRestoreModal(id){
+  const j=findJob(id); if(!j||j.status!=="cancelled") return;
+  if(!userCan("canRestore")){ toast(`${curUser()} ไม่มีสิทธิ์กู้คืนงาน — ให้ผู้ดูแลเปิดสิทธิ์ canRestore ในชีต Users`, true); return; }
+  RS.jobId=j.id;
+  const prevOk=!!(j.previousStatus && ST[j.previousStatus] && j.previousStatus!=="cancelled");
+  /* ใช้สถานะก่อนยกเลิกเป็นค่าเริ่มต้นเมื่อมีบันทึกไว้ — ถ้าไม่มี ต้องเลือกเอง */
+  $("#rs-status").innerHTML=(prevOk?"":`<option value="">— เลือกสถานะ (ไม่มีบันทึกสถานะก่อนยกเลิก) —</option>`)+
+    STATUSES.filter(s=>s.key!=="cancelled").map(s=>`<option value="${s.key}" ${prevOk&&s.key===j.previousStatus?"selected":""}>${esc(s.label)}${prevOk&&s.key===j.previousStatus?" — สถานะก่อนยกเลิก":""}</option>`).join("");
+  $("#rs-info").innerHTML=`<b class="mono">${esc(j.jobNo)}</b> · ${esc(j.product)}<br><span class="muted">ยกเลิกเมื่อ ${esc(fmtBkk(j.cancelledAt))} โดย ${esc(j.cancelledBy||NO_DATA)} · เหตุผล: ${esc(j.cancellationReason||NO_DATA)}</span>`;
+  $("#rs-reason").value=""; $("#rs-by").value=curUser(); $("#rs-pin").value=""; $("#rs-pin-wrap").hidden=state.mode!=="sheets";
+  rsStep(1); openModal("modal-restore");
+}
+function rsStep(n){
+  RS.step=n; $("#rs-err").textContent="";
+  $("#rs-confirm").hidden=n!==2;
+  $$("#rs-status,#rs-reason,#rs-pin").forEach(el=>{ el.disabled=n===2; });
+  $("#rs-next").textContent=n===2?"ยืนยันกู้คืนงาน":"กู้คืนงาน…";
+  $("#rs-back").textContent=n===2?"กลับไปแก้ไข":"ปิด";
+}
+async function rsNext(){
+  if(RS.busy) return;
+  const j=findJob(RS.jobId); if(!j){ closeModal("modal-restore"); return; }
+  const to=$("#rs-status").value, reason=$("#rs-reason").value.trim(), pin=$("#rs-pin").value.trim();
+  const err=t=>{ $("#rs-err").textContent=t; };
+  if(RS.step===1){
+    if(!to||!ST[to]||to==="cancelled") return err("กรุณาเลือกสถานะหลังกู้คืน");
+    if(!reason) return err("กรุณากรอกเหตุผลการกู้คืน");
+    if(state.mode==="sheets" && !pin) return err("กรุณาใส่ PIN ส่วนตัวเพื่อยืนยันตัวตน");
+    rsStep(2); return;
+  }
+  RS.busy=true;
+  const btn=$("#rs-next"), back=$("#rs-back"); btn.disabled=true; back.disabled=true; btn.textContent="กำลังบันทึก…";
+  try{
+    if(state.mode==="sheets"){
+      const r=await gsRun(async()=>{ await gsPush(); return gsApi("restoreJob",{jobId:j.id, userId:state.currentUser&&state.currentUser.id, pin, toStatus:to, toLabel:stLabel(to), reason}); });
+      gsForceRemote({id:j.id, rev:r.rev, job:r.job}); gsPersist();
+    }else{ applyRestoreLocal(j,to,reason); save(); }
+    closeModal("modal-restore");
+    refreshAll();
+    toast(`กู้คืน ${j.jobNo} → ${stLabel(to)} แล้ว`);
+  }catch(e){
+    const code=e&&e.code;
+    if(code==="not_cancelled" && e.data && e.data.job){
+      gsForceRemote({id:j.id, rev:e.data.rev, job:e.data.job}); gsPersist(); closeModal("modal-restore"); refreshAll();
+      toast(`${j.jobNo} ถูกกู้คืนไปแล้วโดยผู้อื่น`, true); return;
+    }
+    if(["bad_pin","pin_not_set","forbidden","user_not_found","reason_required","bad_status"].includes(code)) rsStep(1);
+    err((ACT_ERR[code]||"บันทึกไม่สำเร็จ — ตรวจอินเทอร์เน็ตแล้วลองใหม่")+" · งานยังไม่ถูกกู้คืน");
+  }finally{
+    RS.busy=false; btn.disabled=false; back.disabled=false;
+    btn.textContent=RS.step===2?"ยืนยันกู้คืนงาน":"กู้คืนงาน…";
+  }
+}
+
+/* ================= Business Dashboard: ภาพรวม ================= */
+function renderBizStatus(){
+  const jobs=state.db.jobs, b=jobBuckets(jobs);
+  $("#biz-status-kpis").innerHTML=
+    kpiHtml("งานทั้งหมด",jobs.length,"ทุกสถานะ","","all")+
+    kpiHtml("กำลังดำเนินการ",b.active.length,"ยังไม่ส่งมอบ/ปิดงาน","tone-accent","active")+
+    kpiHtml("เสร็จแล้ว",b.completed.length,"ส่งมอบ / ปิดงาน","tone-good","completed")+
+    kpiHtml("ใกล้ถึงกำหนด",b.duesoon.length,"ภายใน 3 วัน",b.duesoon.length?"tone-warn":"","duesoon")+
+    kpiHtml("ล่าช้า",b.overdue.length,"เลยกำหนดส่ง",b.overdue.length?"tone-critical":"","overdue")+
+    kpiHtml("รอข้อมูล / รออนุมัติ",b.waiting.length,"NEW JOB · ตัวอย่างรออนุมัติ","","waiting")+
+    kpiHtml("ยกเลิก",b.cancelled.length,"แยกจากงานอื่น","tone-cancel","cancelled");
+  bindDrill($("#biz-status-kpis"));
+  $("#biz-rules").innerHTML=COUNT_RULES.map(r=>`<li>${r}</li>`).join("");
+  const tot=Math.max(jobs.length,1);
+  const seg=[["กำลังดำเนินการ",b.active.length,"var(--accent)"],["เสร็จแล้ว",b.completed.length,"var(--good)"],["ยกเลิก",b.cancelled.length,"var(--cancel)"]];
+  const maxN=Math.max(...STATUSES.map(s=>jobs.filter(j=>j.status===s.key).length),1);
+  $("#biz-status-chart").innerHTML=
+    `<div class="stack-bar" role="img" aria-label="${seg.map(s=>`${s[0]} ${s[1]} งาน`).join(" · ")}">${seg.map(([l,n,c])=>n?`<i style="width:${n/tot*100}%;background:${c}" title="${l} ${n} งาน"></i>`:"").join("")}</div>
+    <div class="chart-legend">${seg.map(([l,n,c])=>`<span class="leg-item"><span class="leg-swatch" style="background:${c}"></span>${l} <b class="num">${n}</b></span>`).join("")}</div>`+
+    STATUSES.map(s=>{
+      const n=jobs.filter(j=>j.status===s.key).length;
+      return `<div class="bar-h-row rowdrill" data-status="${s.key}" role="button" tabindex="0" style="cursor:pointer">
+        <span class="lbl">${esc(s.label)}</span>
+        <div class="bar-h-track"><div class="bar-h-fill" style="width:${n/maxN*100}%;background:${s.dot};opacity:.85"></div></div>
+        <span class="bar-h-val num">${n}</span></div>`;
+    }).join("");
+  $("#biz-status-chart").querySelectorAll(".rowdrill").forEach(r=>{
+    const go=()=>openDrill("สถานะ: "+stLabel(r.dataset.status), jobs.filter(j=>j.status===r.dataset.status));
+    r.addEventListener("click",go); r.addEventListener("keydown",e=>{ if(e.key==="Enter") go(); });
+  });
+  const urgent=[
+    ...b.overdue.map(j=>({j,w:0,k:-dueInfo(j).days,why:`ล่าช้า ${dueInfo(j).days} วัน`,cls:"critical"})),
+    ...b.duesoon.map(j=>({j,w:1,k:dueInfo(j).days,why:dueInfo(j).days===0?"ครบกำหนดวันนี้":`อีก ${dueInfo(j).days} วัน`,cls:"warn"})),
+    ...b.active.filter(j=>j.priority==="high"&&!["overdue","duesoon"].includes(dueInfo(j).state)).map(j=>({j,w:2,k:0,why:"High priority",cls:"serious"}))
+  ].sort((a,c)=>a.w-c.w||a.k-c.k).slice(0,12);
+  $("#biz-urgent").innerHTML=`<thead><tr><th>Job</th><th>สินค้า</th><th>สถานะ</th><th>ผู้รับผิดชอบ</th><th>ต้องติดตาม</th></tr></thead><tbody>${urgent.map(x=>`<tr class="rowlink" data-id="${x.j.id}">
+      <td class="mono" style="font-weight:600">${esc(x.j.jobNo)}</td><td>${esc(x.j.product)}<div class="muted small">Due ${fmtD(x.j.dueDate)}</div></td>
+      <td><span class="chip neutral">${esc(stLabel(x.j.status))}</span></td><td>${esc(userName(x.j.responsible))}</td>
+      <td><span class="chip ${x.cls}">${esc(x.why)}</span></td></tr>`).join("")||`<tr><td colspan="5" class="empty-state">ไม่มีงานที่ต้องติดตามเร่งด่วน</td></tr>`}</tbody>`;
+  $("#biz-urgent").querySelectorAll(".rowlink").forEach(r=>r.addEventListener("click",()=>openJob(r.dataset.id)));
+}
+
+/* ================= Business Dashboard: ราย Job ================= */
+function openJobDashboard(id){
+  state.bizMode="job"; state.bizJobId=id; $("#bj-search").value="";
+  if($("#modal-job").classList.contains("open")) closeModal("modal-job");
+  showPage("business");
+}
+function bjMatch(j,q){
+  if(!q) return true;
+  return [j.jobNo,j.product,j.sku,j.customerName,j.customer,userNameOr(j.merchOwner),userNameOr(j.rdOwner)]
+    .some(v=>String(v||"").toLowerCase().includes(q));
+}
+function renderJobDash(){
+  const q=$("#bj-search").value.trim().toLowerCase();
+  const list=state.db.jobs.filter(j=>bjMatch(j,q)).sort((a,b)=>String(a.jobNo).localeCompare(String(b.jobNo),"th",{numeric:true}));
+  if(q && list.length===1) state.bizJobId=list[0].id;
+  const j=state.bizJobId? findJob(state.bizJobId) : null;
+  if(!j) state.bizJobId=null;
+  const opt=x=>`<option value="${x.id}">${esc(x.jobNo)} · ${esc(x.product)}${x.status==="cancelled"?" (ยกเลิก)":""}</option>`;
+  $("#bj-select").innerHTML=`<option value="">— เลือก Job (${list.length} งาน) —</option>`+list.map(opt).join("")+(j&&!list.includes(j)?opt(j):"");
+  $("#bj-select").value=j? j.id : "";
+  $("#bj-open").disabled=!j; $("#bj-pdf").disabled=!j;
+  const box=$("#bj-report");
+  box.dataset.job=j? j.id : "";
+  box.innerHTML=j? jobReportHtml(j) : `<div class="card"><div class="empty-state">${state.db.jobs.length?"ค้นหาหรือเลือก Job จากช่องด้านบน เพื่อดูภาพรวมเฉพาะงานนั้น":"ยังไม่มีงานในระบบ"}</div></div>`;
+  if(!j) return;
+  imgHydrate(box);
+  const z=box.querySelector("[data-zoom]");
+  if(z){ z.addEventListener("click",()=>openImage(j)); z.addEventListener("keydown",e=>{ if(e.key==="Enter"||e.key===" "){ e.preventDefault(); openImage(j); } }); }
+}
+/* ข้อมูลรายงาน — ใช้ทั้งหน้าจอและ PDF; null = ยังไม่มีข้อมูล (ไม่เดาค่า) */
+function jobInfoPairs(j){
+  const created=jobCreatedAt(j), actual=jobActualStart(j), cx=j.status==="cancelled";
+  const nm=id=>userNameOr(id)? esc(userNameOr(id)) : null;
+  return [
+    ["Job No.",esc(j.jobNo)],["ชื่องาน / สินค้า",esc(j.product)],["ลูกค้า",j.customerName?esc(j.customerName):null],
+    ["SKU",j.sku?esc(j.sku):null],["Sales Owner (เซลเจ้าของงาน)",j.customer?esc(j.customer):null],["ผู้รับผิดชอบหลัก",nm(j.responsible)],
+    ["Merchandiser",nm(j.merchOwner)],["R&amp;D",nm(j.rdOwner)],["จำนวนสั่ง",num(j.qty)?money(j.qty)+" pcs":null],
+    ["วันที่สร้าง Job",created?esc(fmtBkk(created)):null],["วันเริ่มงาน (Start Date)",j.startDate?esc(fmtDY(j.startDate)):null],["วันที่เริ่มงานจริง",actual?esc(fmtDY(actual)):null],
+    ["กำหนดส่ง",j.dueDate?esc(fmtDY(j.dueDate)):null],["สถานะปัจจุบัน",esc(stLabel(j.status))],
+    ["ความคืบหน้า",`${jobProgress(j)}% <span class="muted small">(${cx?"ณ วันที่ยกเลิก · ":""}ประเมินจากสถานะ)</span>`]
+  ];
+}
+function timelineData(j){
+  const hs=j.history||[], flow=STATUSES.filter(s=>s.key!=="cancelled");
+  const ref=j.status==="cancelled"? j.previousStatus : j.status;
+  const cur=ST[ref]? ST[ref].idx : -1;
+  const rows=flow.map((s,i)=>{
+    const v=hs.filter(h=>h.status===s.key), first=v[0], last=v[v.length-1];
+    let st;
+    if(!v.length) st= i<cur? "ข้ามขั้นตอนนี้" : j.status==="cancelled"? "ไม่ได้ทำ (ยกเลิกก่อน)" : "ยังไม่ถึง";
+    else if(j.status===s.key && !last.end) st="กำลังดำเนินการ";
+    else st="เสร็จแล้ว";
+    const by=[...new Set(v.map(h=>h.by).filter(x=>x&&x!=="seed"))].join(", ");
+    const note=[v.map(h=>h.note).filter(Boolean).join(" · "), v.length>1?`เข้าขั้นนี้ ${v.length} ครั้ง`:""].filter(Boolean).join(" · ");
+    return {label:s.label, start:first?first.start:null, due:s.key==="delivered"?(j.dueDate||null):null, end:last&&last.end?last.end:null,
+      by:by||null, state:st, note:note||null, cls:st==="กำลังดำเนินการ"?"info":st==="เสร็จแล้ว"?"good":"neutral"};
+  });
+  if(j.status==="cancelled"){
+    const h=hs.filter(x=>x.status==="cancelled").pop();
+    rows.push({label:"ยกเลิกงาน", start:h?h.start:bkkIso(j.cancelledAt), due:null, end:null, by:j.cancelledBy||null, state:"ยกเลิก",
+      note:[j.cancellationReason,j.cancellationDetails].filter(Boolean).join(": ")||null, cls:"cancel"});
+  }
+  return rows;
+}
+function costData(j){
+  const mats=j.materials||[], prodCosts=PROD_COST_FIELDS.filter(([k])=>num((j.costs||{})[k])>0);
+  const price=num(j.sales?.price), sold=num(j.sales?.qtySold);
+  const c={mats,prodCosts,hasMat:mats.length>0,hasProd:prodCosts.length>0,price,sold,hasSales:price>0&&sold>0,
+    mc:materialCost(j),pc:productionCost(j),tc:totalCost(j),sales:totalSales(j),q:num(j.prodQty)||num(j.qty)};
+  c.hasCost=c.hasMat||c.hasProd; c.gp=c.sales-c.tc; c.gm=c.sales>0?c.gp/c.sales*100:0;
+  return c;
+}
+function jobReportHtml(j){
+  const cx=j.status==="cancelled", tl=timelineData(j), c=costData(j), sm=j.samples||[], appr=sm.find(s=>s.status==="approved");
+  const v=x=>x==null?`<span class="nodata">${NO_DATA}</span>`:x;
+  const acts=[...(j.activity||[])].sort((a,b)=>b.ts-a.ts), cxh=j.cancelHistory||[];
+  const nodata=t=>`<span class="nodata">${t||"ไม่มีข้อมูล"}</span>`;
+  return `
+  <div class="card section-gap"><div class="bj-head">
+    <div class="bj-img"${j.image?` data-zoom role="button" tabindex="0" title="ดูรูปขนาดใหญ่"`:""}>${imgHtml(j.image&&j.image.thumbId,j.product)}</div>
+    <div style="min-width:0">
+      <div class="jd-no mono">${esc(j.jobNo)}</div>
+      <h2 class="bj-name">${esc(j.product)}</h2>
+      <div class="jd-chips">${cx?`<span class="chip cancel">⊘ ยกเลิกงาน</span>`:`<span class="chip info">${esc(stLabel(j.status))}</span>`}${priorityChip(j)}${dueChipHtml(j)}</div>
+      <div class="flex mt8" style="max-width:420px"><div class="prog"><i class="${jobProgress(j)>=100?"done":""}" style="width:${jobProgress(j)}%"></i></div><b class="num">${jobProgress(j)}%</b></div>
+      <dl class="info-grid">${jobInfoPairs(j).map(([k,x])=>`<div><dt>${k}</dt><dd>${v(x)}</dd></div>`).join("")}</dl>
+    </div>
+  </div></div>
+  ${cxh.length?`<div class="card section-gap"><div class="card-title">ประวัติการยกเลิก / กู้คืน <span class="hint">บันทึกถาวร แก้ไขไม่ได้</span></div><div class="tbl-wrap"><table class="tbl">
+    <thead><tr><th>รายการ</th><th>วันเวลา</th><th>ผู้ทำรายการ</th><th>เหตุผล / รายละเอียด</th><th>สถานะ</th></tr></thead>
+    <tbody>${cxh.map(e=>`<tr><td><span class="chip ${e.type==="cancel"?"cancel":"good"}">${e.type==="cancel"?"ยกเลิก":"กู้คืน"}</span></td><td class="num">${esc(fmtBkk(e.at))}</td><td>${esc(e.by||NO_DATA)}</td>
+      <td>${esc(e.reason||NO_DATA)}${e.details?`<div class="muted small">${esc(e.details)}</div>`:""}</td><td>${e.type==="cancel"?"จาก "+esc(stLabel(e.fromStatus)):"เป็น "+esc(stLabel(e.toStatus))}</td></tr>`).join("")}</tbody></table></div></div>`:""}
+  <div class="card section-gap"><div class="card-title">Job Timeline <span class="hint">ตาม Workflow ในระบบ · ช่องที่ไม่มีบันทึกแสดง “${NO_DATA}”</span></div><div class="tbl-wrap"><table class="tbl">
+    <thead><tr><th>ขั้นตอน</th><th>เริ่ม</th><th>ครบกำหนด</th><th>เสร็จจริง</th><th>ผู้รับผิดชอบ / ผู้บันทึก</th><th>สถานะ</th><th>หมายเหตุ / ปัญหา</th></tr></thead>
+    <tbody>${tl.map(r=>`<tr><td><b>${esc(r.label)}</b></td><td class="num">${r.start?esc(fmtDY(r.start)):v(null)}</td><td class="num">${r.due?esc(fmtDY(r.due)):v(null)}</td>
+      <td class="num">${r.end?esc(fmtDY(r.end)):r.state==="กำลังดำเนินการ"?"—":v(null)}</td><td>${r.by?esc(r.by):v(null)}</td><td><span class="chip ${r.cls}">${esc(r.state)}</span></td><td>${r.note?esc(r.note):v(null)}</td></tr>`).join("")}</tbody>
+  </table></div></div>
+  <div class="grid2 section-gap">
+    <div class="card"><div class="card-title">Sample &amp; Revision</div>
+      <div class="stat-line"><span>จำนวนรอบตัวอย่าง</span><b class="num">${sm.length} รอบ</b></div>
+      <div class="stat-line"><span>สถานะการอนุมัติ</span><b>${appr?`<span class="chip good">อนุมัติแล้ว · Sample #${appr.no} (${esc(fmtDY(appr.date))})</span>`:sm.length?`<span class="chip warn">ยังไม่อนุมัติ</span>`:nodata()}</b></div>
+      <div class="tbl-wrap mt8"><table class="tbl"><thead><tr><th>รอบ</th><th>วันที่</th><th>รายละเอียด / ปัญหา</th><th>ผล</th></tr></thead>
+        <tbody>${sm.map(s=>`<tr><td><b>#${s.no}</b></td><td class="num">${esc(fmtDY(s.date))}</td><td>${esc(s.desc)||v(null)}</td><td>${s.status==="approved"?'<span class="chip good">Approved</span>':s.status==="revised"?'<span class="chip serious">แก้ไข</span>':'<span class="chip warn">รอผล</span>'}</td></tr>`).join("")||`<tr><td colspan="4" class="empty-state">ไม่มีข้อมูลตัวอย่าง</td></tr>`}</tbody></table></div>
+    </div>
+    <div class="card"><div class="card-title">Materials &amp; Costing</div>
+      <div class="tbl-wrap"><table class="tbl"><thead><tr><th>วัสดุ</th><th class="r">ปริมาณ</th><th class="r">ต้นทุน (฿)</th></tr></thead>
+        <tbody>${c.mats.map(m=>`<tr><td>${esc(m.name||m.type)}<div class="muted small">${esc(m.type)}${m.supplier?" · "+esc(m.supplier):""}</div></td><td class="r num">${num(m.qty)?money2(m.qty)+" "+esc(m.unit||""):v(null)}</td><td class="r num">${money2(num(m.qty)*num(m.costPerUnit)+num(m.flatCost))}</td></tr>`).join("")||`<tr><td colspan="3" class="empty-state">ไม่มีข้อมูลวัสดุ</td></tr>`}</tbody></table></div>
+      <div class="mt8">
+        <div class="stat-line"><span>ต้นทุนวัสดุ</span><b class="num">${c.hasMat?money(c.mc)+" ฿":nodata()}</b></div>
+        <div class="stat-line"><span>ค่าผลิต</span><b class="num">${c.hasProd?money(c.pc)+" ฿":nodata()}</b></div>
+        <div class="stat-line"><span>ต้นทุนรวม</span><b class="num">${c.hasCost?money(c.tc)+" ฿"+(c.q?` <span class="muted small">(${money2(c.tc/c.q)} ฿/ชิ้น)</span>`:""):nodata()}</b></div>
+        <div class="stat-line"><span>ยอดขาย</span><b class="num">${c.hasSales?money(c.sales)+` ฿ <span class="muted small">(${money(c.sold)} × ${money2(c.price)})</span>`:c.price>0?`<span class="nodata">ราคา ${money2(c.price)} ฿/ชิ้น · ยังไม่มียอดขาย</span>`:nodata()}${cx&&c.sales>0?' <span class="chip cancel">ไม่นับเป็นยอดขายจริง</span>':""}</b></div>
+        <div class="stat-line"><span>กำไร / อัตรากำไร</span><b class="num">${c.hasCost&&c.hasSales?`<span style="color:${c.gp>=0?"var(--good-text)":"var(--critical-text)"}">${money(c.gp)} ฿ · ${pct(c.gm)}</span>`:nodata("ข้อมูลไม่พอคำนวณ")}</b></div>
+      </div>
+    </div>
+  </div>
+  <div class="card section-gap"><div class="card-title">Activity Log <span class="hint">${acts.length} รายการ · ล่าสุดก่อน</span></div><div class="tbl-wrap"><table class="tbl">
+    <thead><tr><th style="width:150px">วัน / เวลา</th><th style="width:130px">ผู้ทำรายการ</th><th>รายการ</th></tr></thead>
+    <tbody>${acts.map(a=>`<tr><td class="num muted">${esc(fmtBkk(a.ts))}</td><td>${esc(a.user&&a.user!=="seed"?a.user:"ระบบ")}</td><td>${esc(a.action)}</td></tr>`).join("")||`<tr><td colspan="3" class="empty-state">ไม่มีข้อมูล</td></tr>`}</tbody>
+  </table></div></div>`;
+}
+
+/* ================= หน้า Cancelled Jobs ================= */
+const CXF={q:"",from:"",to:"",customer:"",sales:"",by:"",reason:"",sort:"desc"};
+function cxFillSelect(sel,label,values,cur){
+  const vals=[...new Set(values.filter(Boolean))].sort((a,b)=>a.localeCompare(b,"th"));
+  if(cur && !vals.includes(cur)) vals.unshift(cur);
+  $(sel).innerHTML=`<option value="">${label}: ทั้งหมด</option>`+vals.map(x=>`<option value="${esc(x)}">${esc(x)}</option>`).join("");
+  $(sel).value=cur||"";
+}
+function renderCancelled(){
+  const all=state.db.jobs.filter(j=>j.status==="cancelled");
+  const now=bkkParts(Date.now()), mk=`${now.y}-${p2(now.m+1)}`;
+  const month=all.filter(j=>bkkIso(j.cancelledAt).slice(0,7)===mk);
+  const cnt={}; all.forEach(j=>{ const r=j.cancellationReason||NO_DATA; cnt[r]=(cnt[r]||0)+1; });
+  const top=Object.entries(cnt).sort((a,b)=>b[1]-a[1])[0];
+  const priced=all.filter(j=>num(j.sales&&j.sales.price)>0&&num(j.qty)>0);
+  const value=priced.reduce((x,j)=>x+num(j.sales.price)*num(j.qty),0);
+  $("#cxp-kpis").innerHTML=
+    kpiHtml("งานที่ยกเลิกทั้งหมด",all.length,"เก็บประวัติครบ ไม่ถูกลบจากฐานข้อมูล","tone-cancel")+
+    kpiHtml("ยกเลิกเดือนนี้",month.length,TH_M_FULL[now.m]+" "+(now.y+543))+
+    kpiHtml("สาเหตุที่พบบ่อย",top?`<span style="font-size:15px">${esc(top[0])}</span>`:"—",top?top[1]+" งาน":NO_DATA)+
+    kpiHtml("มูลค่ายอดขายที่ยกเลิก",priced.length?money(value)+" <small>฿</small>":`<span class="nodata" style="font-size:15px">ไม่มีข้อมูล</span>`,
+      priced.length?`ราคาขาย × จำนวนสั่ง · ${priced.length}/${all.length} งานมีราคา · ไม่นับเป็นยอดขายจริง`:"งานที่ยกเลิกยังไม่มีราคาขายบันทึกไว้");
+  cxFillSelect("#cf-customer","ลูกค้า",all.map(j=>j.customerName),CXF.customer);
+  cxFillSelect("#cf-sales","เซล",all.map(j=>j.customer),CXF.sales);
+  cxFillSelect("#cf-by","ผู้ยกเลิก",all.map(j=>j.cancelledBy),CXF.by);
+  cxFillSelect("#cf-reason","เหตุผล",all.map(j=>j.cancellationReason),CXF.reason);
+  const q=CXF.q.trim().toLowerCase();
+  const rows=all.filter(j=>{
+    if(q && !(String(j.jobNo).toLowerCase().includes(q)||String(j.product||"").toLowerCase().includes(q))) return false;
+    const d=bkkIso(j.cancelledAt);
+    if(CXF.from && (!d||d<CXF.from)) return false;
+    if(CXF.to && (!d||d>CXF.to)) return false;
+    if(CXF.customer && j.customerName!==CXF.customer) return false;
+    if(CXF.sales && j.customer!==CXF.sales) return false;
+    if(CXF.by && j.cancelledBy!==CXF.by) return false;
+    if(CXF.reason && j.cancellationReason!==CXF.reason) return false;
+    return true;
+  }).sort((a,b)=>{ const x=String(a.cancelledAt||""), y=String(b.cancelledAt||""); return CXF.sort==="asc"? x.localeCompare(y) : y.localeCompare(x); });
+  $("#cxp-count").textContent=`แสดง ${rows.length} / ${all.length} งาน`;
+  $("#cxp-tbl").innerHTML=`<thead><tr><th></th><th>Job No.</th><th>ชื่องาน</th><th>ลูกค้า</th><th>เซล</th><th>วันที่ยกเลิก</th><th>เหตุผล</th><th>ผู้ยกเลิก</th><th>ก่อนยกเลิก</th><th></th></tr></thead>
+  <tbody>${rows.map(j=>`<tr>
+    <td class="cx-thumb">${imgHtml(j.image&&j.image.thumbId,j.product)}</td>
+    <td class="mono" style="font-weight:600">${esc(j.jobNo)}</td>
+    <td>${esc(j.product)}</td><td>${esc(j.customerName||"—")}</td><td>${esc(j.customer||"—")}</td>
+    <td class="num" style="white-space:nowrap">${esc(fmtBkk(j.cancelledAt))}</td>
+    <td>${esc(j.cancellationReason||NO_DATA)}${j.cancellationDetails?`<div class="muted small">${esc(j.cancellationDetails)}</div>`:""}</td>
+    <td>${esc(j.cancelledBy||NO_DATA)}</td><td><span class="chip neutral">${esc(j.previousStatus?stLabel(j.previousStatus):NO_DATA)}</span></td>
+    <td style="white-space:nowrap"><button class="btn sm" data-open="${j.id}">เปิดดู</button> <button class="btn sm" data-pdf="${j.id}">PDF</button></td>
+  </tr>`).join("")||`<tr><td colspan="10" class="empty-state">${all.length?"ไม่พบงานที่ตรงกับตัวกรอง":"ยังไม่มีงานที่ถูกยกเลิก"}</td></tr>`}</tbody>`;
+  $$("#cxp-tbl [data-open]").forEach(b=>b.addEventListener("click",()=>openJob(b.dataset.open)));
+  $$("#cxp-tbl [data-pdf]").forEach(b=>b.addEventListener("click",()=>exportJobPdf(b.dataset.pdf,b)));
+  imgHydrate($("#cxp-tbl"));
+}
+
+/* ================= Export Job Report PDF =================
+   สร้างหน้า A4 เป็น HTML (แบ่งหน้าเอง ตารางไม่ถูกตัดกลางแถว) → html2canvas → jsPDF แล้วดาวน์โหลดไฟล์ PDF จริง
+   ตัวอักษรไทยแสดงผลด้วยเบราว์เซอร์ จึงถูกต้องครบ (ข้อจำกัด: ข้อความใน PDF เป็นภาพ เลือก/ค้นหาข้อความไม่ได้) */
+const PDF={busy:false,last:null};
+const PDF_LIBS=["https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js","https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"];
+function loadScriptOnce(src){
+  return new Promise((res,rej)=>{
+    const ex=document.querySelector(`script[data-lib="${src}"]`);
+    if(ex){ if(ex.dataset.ok) return res(); ex.addEventListener("load",()=>res()); ex.addEventListener("error",()=>rej(new Error("load"))); return; }
+    const s=document.createElement("script"); s.src=src; s.async=true; s.crossOrigin="anonymous"; s.referrerPolicy="no-referrer"; s.dataset.lib=src;
+    s.onload=()=>{ s.dataset.ok="1"; res(); }; s.onerror=()=>{ s.remove(); rej(new Error("load")); };
+    document.head.appendChild(s);
+  });
+}
+async function loadPdfLibs(){
+  if(window.html2canvas && window.jspdf) return;
+  const t=new Promise((_,rej)=>setTimeout(()=>rej(new Error("timeout")),25000));
+  try{ await Promise.race([Promise.all(PDF_LIBS.map(loadScriptOnce)),t]); }catch(e){ throw new Error("โหลดเครื่องมือสร้าง PDF ไม่ได้ — ตรวจอินเทอร์เน็ตแล้วลองใหม่"); }
+  if(!window.html2canvas || !window.jspdf) throw new Error("โหลดเครื่องมือสร้าง PDF ไม่ได้");
+}
+function imgNatural(u){ return new Promise(res=>{ const im=new Image(); im.onload=()=>res({w:im.naturalWidth,h:im.naturalHeight}); im.onerror=()=>res(null); im.src=u; }); }
+async function exportJobPdf(jobId,btn){
+  if(PDF.busy){ toast("กำลังสร้าง PDF อยู่ — รอสักครู่", true); return; }
+  PDF.busy=true;
+  const label=btn?btn.textContent:""; if(btn){ btn.disabled=true; btn.textContent="กำลังสร้าง PDF…"; }
+  const warn=[];
+  try{
+    if(state.mode==="sheets"){   /* ดึงข้อมูลล่าสุดจาก Sheet ก่อนสร้างรายงาน */
+      await gsSyncNow();
+      if(gsState.error||gsState.locked) warn.push("ดึงข้อมูลล่าสุดจาก Google Sheet ไม่สำเร็จ — รายงานใช้ข้อมูลที่ซิงค์ล่าสุดในเครื่อง");
+    }
+    const j=findJob(jobId); if(!j) throw new Error("ไม่พบ Job นี้แล้ว (อาจถูกลบ)");
+    await loadPdfLibs();
+    try{ await document.fonts.ready; }catch(e){}
+    let img=null;
+    if(j.image){
+      const u=(await imgEnsure(j.image.id)) || (await imgEnsure(j.image.thumbId));
+      const n=u? await imgNatural(u) : null;
+      if(u&&n) img={url:u,...n}; else warn.push("โหลดรูปสินค้าไม่สำเร็จ — ในรายงานจะแสดงหมายเหตุแทนรูป");
+    }
+    const pages=rptBuild(j,img);
+    const doc=new window.jspdf.jsPDF({unit:"mm",format:"a4",orientation:"portrait",compress:true});
+    for(let i=0;i<pages.length;i++){
+      pages.forEach((p,k)=>{ p.style.display=k===i?"flex":"none"; });
+      const canvas=await window.html2canvas(pages[i],{scale:2,backgroundColor:"#ffffff",logging:false,useCORS:true,windowWidth:1280,windowHeight:1300});
+      if(i) doc.addPage();
+      doc.addImage(canvas.toDataURL("image/jpeg",0.92),"JPEG",0,0,210,297,undefined,"FAST");
+    }
+    doc.setProperties({title:`GarmentFlow Job Report ${j.jobNo}`,subject:String(j.product||""),creator:"GarmentFlow PMS",author:curUser()});
+    const name=`GarmentFlow_JobReport_${String(j.jobNo).replace(/[^\w\-]+/g,"_")}_${bkkIso(Date.now())}.pdf`;
+    PDF.last={name,pages:pages.length,doc};
+    doc.save(name);
+    warn.forEach(w=>toast(w,true));
+    toast(`ดาวน์โหลด ${name} แล้ว (${pages.length} หน้า)`);
+  }catch(e){ toast("สร้าง PDF ไม่สำเร็จ: "+(e.message||e), true); }
+  finally{
+    const root=$("#rpt-root"); if(root) root.remove();
+    PDF.busy=false; if(btn){ btn.disabled=false; btn.textContent=label; }
+  }
+}
+function rptBuild(j,img){
+  const old=$("#rpt-root"); if(old) old.remove();
+  const root=document.createElement("div"); root.id="rpt-root"; root.setAttribute("aria-hidden","true"); document.body.appendChild(root);
+  const gen=fmtBkkLong(Date.now()), pages=[]; let body;
+  const newPage=()=>{
+    const p=document.createElement("div"); p.className="rpt-page";
+    p.innerHTML=`<div class="rpt-hd"><span><b>GarmentFlow PMS</b> · Job Report</span><span class="mono">${esc(j.jobNo)}</span></div><div class="rpt-body"></div><div class="rpt-ft"><span>สร้างรายงาน ${esc(gen)} (เวลาประเทศไทย) · โดย ${esc(curUser())}</span><span class="rpt-pn"></span></div>`;
+    root.appendChild(p); pages.push(p); body=p.querySelector(".rpt-body");
+  };
+  const over=()=>body.scrollHeight>body.clientHeight+1;
+  const el=html=>{ const t=document.createElement("template"); t.innerHTML=html.trim(); return t.content.firstElementChild; };
+  const block=html=>{ const e=el(html); body.appendChild(e); if(over() && body.children.length>1){ body.removeChild(e); newPage(); body.appendChild(e); } };
+  const table=(title,cols,rows,empty)=>{
+    const head=`<tr>${cols.map(([l,w,c])=>`<th style="width:${w}%"${c?` class="${c}"`:""}>${l}</th>`).join("")}</tr>`;
+    const mk=cont=>el(`<div class="rpt-sec"><h3>${title}${cont?' <span class="cont">(ต่อ)</span>':""}</h3><table class="rpt-tbl"><thead>${head}</thead><tbody></tbody></table></div>`);
+    let sec=mk(false); body.appendChild(sec); let tb=sec.querySelector("tbody");
+    const list=rows.length? rows : [`<tr><td colspan="${cols.length}" class="rpt-empty">${empty}</td></tr>`];
+    for(const r of list){
+      tb.insertAdjacentHTML("beforeend",r);
+      if(!over()) continue;
+      const last=tb.lastElementChild; tb.removeChild(last);
+      const fresh=!tb.children.length;   /* ถ้ายังไม่มีแถวเลย ย้ายทั้งหัวข้อไปหน้าใหม่ */
+      if(fresh) body.removeChild(sec);
+      newPage(); sec=mk(!fresh); body.appendChild(sec); tb=sec.querySelector("tbody"); tb.appendChild(last);
+    }
+  };
+  const na=t=>`<span class="rpt-na">${t||NO_DATA}</span>`;
+  const kv=pairs=>`<dl class="rpt-kv">${pairs.map(([k,x])=>`<div><dt>${k}</dt><dd>${x==null?na():x}</dd></div>`).join("")}</dl>`;
+  const cx=j.status==="cancelled", prog=jobProgress(j), di=dueInfo(j);
+  let imgBox;
+  if(img){ const s=Math.min(196/img.w,196/img.h,1), w=Math.round(img.w*s), h=Math.round(img.h*s); imgBox=`<img src="${img.url}" style="width:${w}px;height:${h}px;display:block" alt="">`; }
+  else imgBox= j.image? "โหลดรูปสินค้าไม่สำเร็จ<br>(รูปอาจถูกลบหรือไม่มีสิทธิ์เข้าถึง)" : "ไม่มีรูปสินค้า";
+  const dataAt= state.mode==="sheets"? (gsState.lastPull? "ข้อมูลจาก Google Sheet ณ "+fmtBkk(gsState.lastPull) : "ข้อมูลจากเครื่องนี้ (ยังไม่ได้ซิงค์)") : "ข้อมูลที่บันทึกในเครื่องนี้";
+  newPage();
+  block(`<div class="rpt-title"><div>
+    <div class="rpt-kicker">รายงานสรุปงาน · JOB REPORT</div>
+    <h1>${esc(j.product)}</h1><div class="rpt-no">${esc(j.jobNo)}</div>
+    <div class="rpt-chips">${cx?`<span class="rpt-chip cancel">⊘ ยกเลิกงาน</span>`:`<span class="rpt-chip">${esc(stLabel(j.status))}</span>`}${j.priority==="high"?`<span class="rpt-chip crit">High priority</span>`:""}${di.state==="overdue"?`<span class="rpt-chip crit">ล่าช้า ${di.days} วัน</span>`:di.state==="duesoon"?`<span class="rpt-chip">อีก ${di.days} วันถึงกำหนด</span>`:di.state==="done"?`<span class="rpt-chip good">เสร็จแล้ว</span>`:""}</div>
+    <div class="rpt-prog"><span><i style="width:${prog}%"></i></span><b>${prog}%</b> <small style="color:#7a7d86">ความคืบหน้า (ประเมินจากสถานะ${cx?" ณ วันที่ยกเลิก":""})</small></div>
+    <div class="rpt-note">${esc(dataAt)}</div>
+  </div><div class="rpt-imgbox">${imgBox}</div></div>`);
+  block(`<div class="rpt-sec"><h3>ข้อมูลพื้นฐาน</h3>${kv(jobInfoPairs(j).filter(([k])=>k!=="ความคืบหน้า").map(([k,x])=>[k,x]))}</div>`);
+  if(cx) block(`<div class="rpt-sec"><h3>ข้อมูลการยกเลิก</h3>${kv([["วันเวลาที่ยกเลิก",esc(fmtBkk(j.cancelledAt))],["ผู้ยกเลิก",j.cancelledBy?esc(j.cancelledBy):null],["สถานะก่อนยกเลิก",j.previousStatus?esc(stLabel(j.previousStatus)):null],["เหตุผล",j.cancellationReason?esc(j.cancellationReason):null],["รายละเอียดเพิ่มเติม",j.cancellationDetails?esc(j.cancellationDetails):null]])}</div>`);
+  const cxh=j.cancelHistory||[];
+  if(cxh.length) table("ประวัติการยกเลิก / กู้คืน",[["รายการ",12],["วันเวลา",18],["ผู้ทำรายการ",16],["เหตุผล / รายละเอียด",36],["สถานะ",18]],
+    cxh.map(e=>`<tr><td>${e.type==="cancel"?"ยกเลิก":"กู้คืน"}</td><td>${esc(fmtBkk(e.at))}</td><td>${esc(e.by||NO_DATA)}</td><td>${esc(e.reason||NO_DATA)}${e.details?"<br>"+esc(e.details):""}</td><td>${e.type==="cancel"?"จาก "+esc(stLabel(e.fromStatus)):"เป็น "+esc(stLabel(e.toStatus))}</td></tr>`),"");
+  table("Timeline",[["ขั้นตอน",15],["เริ่ม",10],["ครบกำหนด",10],["เสร็จจริง",10],["ผู้รับผิดชอบ / ผู้บันทึก",15],["สถานะ",13],["หมายเหตุ / ปัญหา",27]],
+    timelineData(j).map(r=>`<tr><td><b>${esc(r.label)}</b></td><td>${r.start?esc(fmtDY(r.start)):na()}</td><td>${r.due?esc(fmtDY(r.due)):na()}</td><td>${r.end?esc(fmtDY(r.end)):r.state==="กำลังดำเนินการ"?"—":na()}</td><td>${r.by?esc(r.by):na()}</td><td>${esc(r.state)}</td><td>${r.note?esc(r.note):na()}</td></tr>`),NO_DATA);
+  const sm=j.samples||[], appr=sm.find(s=>s.status==="approved");
+  block(`<div class="rpt-sec"><h3>Sample &amp; Revision</h3>${kv([["จำนวนรอบตัวอย่าง",sm.length+" รอบ"],["สถานะการอนุมัติ",appr?`อนุมัติแล้ว — Sample #${appr.no} (${esc(fmtDY(appr.date))})`:sm.length?"ยังไม่อนุมัติ":null],["จำนวนตัวอย่าง (pcs)",num(j.sampleQty)?money(j.sampleQty):null]])}</div>`);
+  table("ประวัติการทำตัวอย่าง",[["รอบ",8],["วันที่",14],["รายละเอียด / ปัญหา",62],["ผล",16]],
+    sm.map(s=>`<tr><td>#${s.no}</td><td>${esc(fmtDY(s.date))}</td><td>${esc(s.desc)||na()}</td><td>${s.status==="approved"?"Approved":s.status==="revised"?"ต้องแก้ไข":"รอผล"}</td></tr>`),"ไม่มีข้อมูล");
+  const c=costData(j);
+  table("Materials",[["ประเภท",12],["วัสดุ",24],["Supplier",18],["ปริมาณ",14,"r"],["ราคา/หน่วย",14,"r"],["รวม (฿)",18,"r"]],
+    c.mats.map(m=>`<tr><td>${esc(m.type)}</td><td>${esc(m.name)||na()}</td><td>${esc(m.supplier)||na()}</td><td class="r">${num(m.qty)?money2(m.qty)+" "+esc(m.unit||""):na()}</td><td class="r">${num(m.costPerUnit)?money2(m.costPerUnit):"—"}${num(m.flatCost)?`<br>+ เหมา ${money2(m.flatCost)}`:""}</td><td class="r">${money2(num(m.qty)*num(m.costPerUnit)+num(m.flatCost))}</td></tr>`),"ไม่มีข้อมูล");
+  if(c.hasProd) table("ค่าผลิต",[["รายการ",60],["จำนวนเงิน (฿)",40,"r"]],c.prodCosts.map(([k,l])=>`<tr><td>${esc(l)}</td><td class="r">${money2(j.costs[k])}</td></tr>`),"");
+  block(`<div class="rpt-sec"><h3>Costing &amp; Profit</h3><dl class="rpt-sum">${[
+    ["ต้นทุนวัสดุ",c.hasMat?money(c.mc)+" ฿":null],["ค่าผลิต",c.hasProd?money(c.pc)+" ฿":null],["ต้นทุนรวม",c.hasCost?money(c.tc)+" ฿":null],
+    ["ต้นทุน / ชิ้น",c.hasCost&&c.q?money2(c.tc/c.q)+" ฿":null],["ยอดขาย",c.hasSales?money(c.sales)+" ฿":null],["กำไร / อัตรากำไร",c.hasCost&&c.hasSales?`${money(c.gp)} ฿ · ${pct(c.gm)}`:null]
+  ].map(([k,x])=>`<div><dt>${k}</dt><dd>${x==null?na("ไม่มีข้อมูล"):x}</dd></div>`).join("")}</dl>${cx&&c.sales>0?`<div class="rpt-note">งานนี้ถูกยกเลิก — ยอดขายข้างต้นไม่นับเป็นยอดขายที่สำเร็จ</div>`:""}</div>`);
+  const acts=[...(j.activity||[])].sort((a,b)=>b.ts-a.ts);
+  table("Activity Log",[["วัน / เวลา",20],["ผู้ทำรายการ",18],["รายการ",62]],
+    acts.map(a=>`<tr><td>${esc(fmtBkk(a.ts))}</td><td>${esc(a.user&&a.user!=="seed"?a.user:"ระบบ")}</td><td>${esc(a.action)}</td></tr>`),"ไม่มีข้อมูล");
+  pages.forEach((p,i)=>{ p.querySelector(".rpt-pn").textContent=`หน้า ${i+1} / ${pages.length} · ${j.jobNo}`; });
+  return pages;
+}
+
+/* ================= ผูกปุ่ม v2 ================= */
+(function bindV2(){
+  $$("#biz-mode button").forEach(b=>b.addEventListener("click",()=>{ state.bizMode=b.dataset.m; renderBusiness(); }));
+  $("#bj-search").addEventListener("input",()=>renderJobDash());
+  $("#bj-select").addEventListener("change",e=>{ state.bizJobId=e.target.value||null; renderJobDash(); });
+  $("#bj-open").addEventListener("click",()=>{ if(state.bizJobId) openJob(state.bizJobId); });
+  $("#bj-pdf").addEventListener("click",e=>{ if(state.bizJobId) exportJobPdf(state.bizJobId,e.currentTarget); });
+  $("#cx-next").addEventListener("click",cxNext);
+  $("#cx-back").addEventListener("click",()=>{ if(CX.step===2) cxStep(1); else closeModal("modal-cancel"); });
+  $("#cx-reason").addEventListener("change",()=>{ $("#cx-details-req").hidden=$("#cx-reason").value!=="อื่น ๆ"; });
+  $("#rs-next").addEventListener("click",rsNext);
+  $("#rs-back").addEventListener("click",()=>{ if(RS.step===2) rsStep(1); else closeModal("modal-restore"); });
+  $("#nj-img-file").addEventListener("change",e=>{ const f=e.target.files&&e.target.files[0]; if(f) njImageChosen(f); });
+  $("#nj-img-pick").addEventListener("keydown",e=>{ if(e.key==="Enter"||e.key===" "){ e.preventDefault(); $("#nj-img-file").click(); } });
+  $("#nj-img-remove").addEventListener("click",njImageClear);
+  const cf=[["#cf-q","q","input"],["#cf-from","from","change"],["#cf-to","to","change"],["#cf-customer","customer","change"],["#cf-sales","sales","change"],["#cf-by","by","change"],["#cf-reason","reason","change"],["#cf-sort","sort","change"]];
+  cf.forEach(([sel,k,ev])=>$(sel).addEventListener(ev,e=>{ CXF[k]=e.target.value; renderCancelled(); }));
+  $("#cf-clear").addEventListener("click",()=>{ Object.assign(CXF,{q:"",from:"",to:"",customer:"",sales:"",by:"",reason:"",sort:"desc"}); cf.forEach(([sel,k])=>{ $(sel).value=CXF[k]; }); renderCancelled(); });
+  /* ปุ่มยกเลิก/กู้คืนแสดงตามสิทธิ์ของผู้ใช้ที่เลือกอยู่ */
+  $("#user-select").addEventListener("change",()=>setTimeout(refreshAll,0));
+})();
+</script>
+<script>
+"use strict";
 /* ================= CALENDAR ================= */
 const EV_TYPES=[
   {key:"sample", label:"Sample", color:"var(--s1)"},
@@ -2252,7 +3426,8 @@ const EV_TYPES=[
   {key:"sewing", label:"Sewing", color:"var(--s5)"},
   {key:"qc", label:"QC", color:"var(--s4)"},
   {key:"due", label:"Delivery Due", color:"var(--s8)"},
-  {key:"delivered", label:"Delivered", color:"var(--s3)"}
+  {key:"delivered", label:"Delivered", color:"var(--s3)"},
+  {key:"cancelled", label:"Cancelled", color:"var(--cancel)"}
 ];
 function calEvents(){
   const evs=[];
@@ -2263,7 +3438,8 @@ function calEvents(){
     push("cutting",(h("cutting")||{}).start,"เริ่มตัด");
     push("sewing",(h("sewing")||{}).start,"เริ่มเย็บ");
     push("qc",(h("qc")||{}).start,"QC");
-    push("due",j.dueDate,"กำหนดส่ง");
+    if(j.status==="cancelled") push("cancelled",bkkIso(j.cancelledAt),"ยกเลิกงาน");   /* งานที่ยกเลิกไม่มีกำหนดส่งแล้ว */
+    else push("due",j.dueDate,"กำหนดส่ง");
     push("delivered",(h("delivered")||{}).start,"ส่งมอบแล้ว");
   });
   return evs;
@@ -2360,7 +3536,7 @@ function renderGantt(){
 /* ================= TEAM ================= */
 function renderTeam(){
   const jobs=state.db.jobs;
-  const active=jobs.filter(j=>!["delivered","closed"].includes(j.status));
+  const active=jobs.filter(j=>!["delivered","closed","cancelled"].includes(j.status));
   const od=jobs.filter(j=>dueInfo(j).state==="overdue");
   const busiest=[...state.db.users].map(u=>({u,n:active.filter(j=>j.responsible===u.id).length})).sort((a,b)=>b.n-a.n)[0];
   $("#team-kpis").innerHTML=
@@ -2372,7 +3548,7 @@ function renderTeam(){
   $("#team-tbl").innerHTML=`<thead><tr><th>ผู้รับผิดชอบ</th><th>Role</th><th style="width:34%">งานในมือ</th><th class="r">Active</th><th class="r">Overdue</th><th class="r">Due 3 วัน</th><th class="r">จบแล้ว</th></tr></thead>
   <tbody>${state.db.users.map(u=>{
     const mine=jobs.filter(j=>j.responsible===u.id);
-    const a=mine.filter(j=>!["delivered","closed"].includes(j.status));
+    const a=mine.filter(j=>!["delivered","closed","cancelled"].includes(j.status));
     const o=mine.filter(j=>dueInfo(j).state==="overdue");
     const ds=mine.filter(j=>dueInfo(j).state==="duesoon");
     const done=mine.filter(j=>["delivered","closed"].includes(j.status));
@@ -2388,7 +3564,7 @@ function renderTeam(){
   }).join("")}</tbody>`;
   $("#team-tbl").querySelectorAll(".rowlink").forEach(r=>r.addEventListener("click",()=>{
     const u=state.db.users.find(x=>x.id===r.dataset.uid);
-    const mine=jobs.filter(j=>j.responsible===u.id&&!["delivered","closed"].includes(j.status))
+    const mine=jobs.filter(j=>j.responsible===u.id&&!["delivered","closed","cancelled"].includes(j.status))
       .sort((a,b)=>(a.dueDate||"9999").localeCompare(b.dueDate||"9999"));
     $("#team-detail-card").hidden=false;
     $("#team-detail-title").textContent=`งานในมือของ ${u.name} (${mine.length})`;
